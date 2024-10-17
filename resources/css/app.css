@@ -1,0 +1,82 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Estilos globais */
+body {
+  font-family: 'Arial', sans-serif;
+  background-color: #f4f4f4;
+  color: #333;
+  margin: 0;
+  padding: 0;
+}
+
+nav {
+  background-color: #007bff; /* Cor de fundo da barra de navegação */
+  padding: 1rem; /* Espaçamento na barra de navegação */
+  border-radius: 5px;
+}
+
+nav ul {
+  list-style: none; /* Remove marcadores da lista */
+  display: flex; /* Alinha os itens em linha */
+  gap: 1rem; /* Espaçamento entre os itens */
+}
+
+nav a {
+  color: white; /* Cor do texto dos links */
+  
+  padding: 0.5rem 1rem; /* Espaçamento interno nos links */
+}
+
+.link {
+  text-decoration: none; /* Remove sublinhado */
+}
+
+nav a:hover {
+  background-color: #0056b3; /* Cor de fundo no hover */
+  border-radius: 5px; /* Arredondamento nas bordas */
+}
+
+.container {
+  max-width: 800px; /* Largura máxima do conteúdo */
+  margin: 2rem auto; /* Centraliza o conteúdo */
+  padding: 1rem; /* Espaçamento interno */
+  background-color: rgb(255, 255, 255); /* Cor de fundo do conteúdo */
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Sombra */
+  border-radius: 8px; /* Bordas arredondadas */
+}
+
+h1, h2, h3 {
+  color: #333; /* Cor dos cabeçalhos */
+}
+
+input, select, textarea {
+  width: 100%; /* Largura total */
+  padding: 0.5rem; /* Espaçamento interno */
+  margin-bottom: 1rem; /* Espaçamento inferior */
+  border: 1px solid #333; /* Borda */
+  border-radius: 5px; /* Arredondamento nas bordas */
+}
+
+/* Estilo para inputs de texto */
+input[type="text"],
+input[type="tel"],
+input[type="date"] {
+    border-color: #333; /* Cor da borda */
+    border-radius: 5px; /* Arredondamento nas bordas */
+}
+
+button {
+  background-color: #007bff; /* Cor do botão */
+  color: white; /* Cor do texto do botão */
+  padding: 0.5rem 1rem; /* Espaçamento interno do botão */
+  border: none; /* Sem borda */
+  border-radius: 5px; /* Arredondamento nas bordas */
+  cursor: pointer; /* Muda o cursor ao passar o mouse */
+}
+
+button:hover {
+  background-color: #0056b3; /* Cor de fundo do botão ao passar o mouse */
+}
+
