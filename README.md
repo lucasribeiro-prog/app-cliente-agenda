@@ -11,7 +11,7 @@ Este projeto é um Sistema de Agendamentos construído com Laravel 10 e Vue 3 (i
 *Tecnologias Utilizadas*
 
 Backend:
--Laravel 10
+-Laravel 11
 -Inertia.js
 -MySQL
 
