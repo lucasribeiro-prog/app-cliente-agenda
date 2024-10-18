@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('contatos', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('id_cliente');
-            $table->varchar('telefone', 15);
+            $table->string('telefone', 15);
             $table->timestamps();
 
             $table->foreign('id_cliente')->references('id')->on('clientes');

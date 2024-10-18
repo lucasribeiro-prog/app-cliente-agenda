@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('nome', 40);
             $table->char('cpf', 11)->unique();
-            $table->varchar('matricula', 200);
+            $table->string('matricula', 200);
             $table->timestamps();
         });
     }
