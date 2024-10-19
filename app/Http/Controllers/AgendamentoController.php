@@ -30,7 +30,35 @@ class AgendamentoController extends Controller
      */
     public function store(Request $request)
     {
-        //dd($request->all());
+        //Formatando o cpf e telefone
+        $request->merge([
+            'cpf' => preg_replace('/[^0-9]/', '', $request->get('cpf')),
+            'telefone' => preg_replace('/[^0-9]/', '', $request->input('telefone')), 
+        ]);
+
+        //Validando os dados
+        $regras = [
+            'nome' => 'required|min:3|max:40',
+            'cpf' => 'required|size:11|unique:clientes,cpf',
+            'matricula' => 'required',
+            'telefone' => 'required|size:11',
+            'atendimento' => 'exists:atendimentos,id',
+            'data' => 'required|date',
+            'hora' => 'required|date_format:H:i:s',
+            'data_leilao' => 'required|date',
+            'categoria' => 'exists:categorias,id',
+        ];
+
+        $feedback = [
+            'nome.min' => 'O campo nome deve conter no minimo 3 caracteres',
+            'size'  => 'O campo :attribute deve conter exatamente 11 digitos',
+            'required' => 'O campo :attribute deve ser preenchido',
+            'atendimento.exists'=> 'Selecione uma opção válida',
+            'categoria.exists' =>  'Selecione uma opção válida',
+        ];
+
+        $request->validate($regras, $feedback);
+
         $cliente = new Cliente();
         $cliente->nome = $request->get('nome');
         $cliente->cpf = $request->get('cpf');
@@ -52,7 +80,7 @@ class AgendamentoController extends Controller
         $agendamento->id_categoria = $request->get('categoria');
         $agendamento->save();
 
-        return response()->json($agendamento);
+        return response()->json(['success' => true, 'data' => $agendamento]);
 
     }
 
