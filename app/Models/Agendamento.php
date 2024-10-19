@@ -3,10 +3,21 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Crypt;
+use App\Models\User;
+use App\Models\Atendimento;
+use App\Models\Categoria;
+use App\Models\Cliente;
+use App\Models\Contato;
 
 class Agendamento extends Model
 {
     protected $fillable = ['id_cliente', 'id_contato', 'categoria', 'data_leilao', 'data', 'hora'];
+
+    public function getTelefoneAttribute($value)
+    {
+        return Crypt::decryptString($value);
+    }
 
     public static function rules()
     {
@@ -34,5 +45,30 @@ class Agendamento extends Model
             'categoria.exists' =>  'Selecione uma opção válida',
             'usuario.exists' =>  'Selecione uma opção válida',
         ];
+    }
+
+    public function usuarios()
+    {
+        return $this->belongsTo(User::class, 'id_usuario');
+    }
+
+    public function clientes()
+    {
+        return $this->belongsTo(Cliente::class, 'id_cliente');
+    }
+
+    public function contatos()
+    {
+        return $this->belongsTo(Contato::class, 'id_contato');
+    }
+
+    public function categorias()
+    {
+        return $this->belongsTo(Categoria::class, 'id_categoria');
+    }
+
+    public function atendimentos()
+    {
+        return $this->belongsTo(Atendimento::class, 'id_atendimento');
     }
 }

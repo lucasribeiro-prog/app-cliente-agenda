@@ -7,6 +7,8 @@ use App\Models\Cliente;
 use App\Models\Contato;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\DB;
 
 class AgendamentoController extends Controller
 {
@@ -15,7 +17,16 @@ class AgendamentoController extends Controller
      */
     public function index()
     {
-        //
+        
+        $agendamentos = Agendamento::with([
+            'usuarios:id,name',
+            'clientes:id,nome',
+            'contatos:id,telefone',
+            'categorias:id,categoria',
+            'atendimentos:id,antendimento'
+        ])->get();
+
+        return response()->json($agendamentos);
     }
 
     /**

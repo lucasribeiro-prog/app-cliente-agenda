@@ -9,15 +9,20 @@ class Contato extends Model
 {
     protected $fillable = ['id_cliente', 'telefone'];
 
-    // Mutator para criptografar o telefone antes de salvar no banco
+    // Criptografar o telefone antes de salvar no banco
     public function setTelefoneAttribute($value)
     {
         $this->attributes['telefone'] = Crypt::encryptString($value);
     }
 
-    // Accessor para descriptografar o telefone ao recuperar do banco
+    // Descriptografar o telefone ao recuperar do banco
     public function getTelefoneAttribute($value)
     {
         return Crypt::decryptString($value);
+    }
+
+    public function clientes()
+    {
+        return $this->belongsTo('App\Models\Cliente');
     }
 }

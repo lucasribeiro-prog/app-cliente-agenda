@@ -20,4 +20,9 @@ class Cliente extends Model
     {
         return Crypt::decryptString($value);
     }
+
+    public function contatos()
+    {
+        return $this->hasMany('App\Models\Contato', 'id_cliente', 'id');
+    }
 }
