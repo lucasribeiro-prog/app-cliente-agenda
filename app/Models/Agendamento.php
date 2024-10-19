@@ -11,6 +11,7 @@ class Agendamento extends Model
     public static function rules()
     {
         return [
+            'usuario'  => 'exists:user,id',
             'nome' => 'required|min:3|max:40',
             'cpf' => 'required|size:11|unique:clientes,cpf',
             'matricula' => 'required',
@@ -31,6 +32,7 @@ class Agendamento extends Model
             'required' => 'O campo :attribute deve ser preenchido',
             'atendimento.exists'=> 'Selecione uma opção válida',
             'categoria.exists' =>  'Selecione uma opção válida',
+            'usuario.exists' =>  'Selecione uma opção válida',
         ];
     }
 }

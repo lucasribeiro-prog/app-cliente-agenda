@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Agendamento;
 use App\Models\Cliente;
 use App\Models\Contato;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class AgendamentoController extends Controller
@@ -51,7 +52,10 @@ class AgendamentoController extends Controller
         $contato->telefone = $request->get('telefone');
         $contato->save();
 
+        $usuario  =  new User();
+
         $agendamento = new Agendamento();
+        $agendamento->id_usuario = $request->get('id_usuario');
         $agendamento->id_cliente = $cliente->id;
         $agendamento->id_contato = $contato->id;
         $agendamento->id_atendimento = $request->get('atendimento');
