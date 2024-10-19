@@ -6,20 +6,16 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', function () {
-    return Inertia::render('Auth/Login'); // Alterado para renderizar a página Home
+    return Inertia::render('Auth/Login');
 });
 
 Route::get('/home', function () {
-    return Inertia::render('Home'); // Alterado para renderizar a página Home
+    return Inertia::render('Home');
 })->middleware(['auth', 'verified'])->name('home');
 
-Route::get('/agendar', function () {
-    return Inertia::render('Agendar'); // Adicionada a rota para a página Agendar
-})->middleware(['auth']); // Você pode adicionar middleware de autenticação se necessário
-
 Route::get('/consultar', function () {
-    return Inertia::render('Consultar'); // Adicionada a rota para a página Consultar
-})->middleware(['auth']); // Você pode adicionar middleware de autenticação se necessário
+    return Inertia::render('Consultar'); 
+})->middleware(['auth']); 
 
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
