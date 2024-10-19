@@ -13,6 +13,10 @@ Route::get('/home', function () {
     return Inertia::render('Home');
 })->middleware(['auth', 'verified'])->name('home');
 
+Route::get('/agendar', function () {
+    return Inertia::render('Agendar'); 
+})->middleware(['auth']); 
+
 Route::get('/consultar', function () {
     return Inertia::render('Consultar'); 
 })->middleware(['auth']); 

@@ -9,3 +9,4 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
 
 Route::resource('agendar', \App\Http\Controllers\AgendamentoController::class);
+Route::resource('cliente', \App\Http\Controllers\ClienteController::class);
