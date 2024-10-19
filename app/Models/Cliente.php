@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Crypt;
+use App\Models\Contato;
 
 class Cliente extends Model
 {
@@ -23,6 +24,6 @@ class Cliente extends Model
 
     public function contatos()
     {
-        return $this->hasMany('App\Models\Contato', 'id_cliente', 'id');
+        return $this->hasMany(Contato::class, 'id_cliente', 'id');
     }
 }

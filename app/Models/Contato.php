@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Crypt;
+use App\Models\Cliente;
 
 class Contato extends Model
 {
@@ -23,6 +24,6 @@ class Contato extends Model
 
     public function clientes()
     {
-        return $this->belongsTo('App\Models\Cliente');
+        return $this->belongsTo(Cliente::class, 'id_cliente');
     }
 }

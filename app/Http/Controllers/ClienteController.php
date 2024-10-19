@@ -12,8 +12,9 @@ class ClienteController extends Controller
      */
     public function index()
     {
-        $cliente = Cliente::all();
-        return $cliente;
+        $clientes = Cliente::with(['contatos:id,id_cliente,telefone'])->get();
+        
+        return response()->json($clientes);
     }
 
     /**

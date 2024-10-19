@@ -12,7 +12,11 @@ class ContatoController extends Controller
      */
     public function index()
     {
-        //
+        $contatos = Contato::with([
+            'clientes:id,nome',
+        ])->get();
+        
+        return response()->json($contatos);
     }
 
     /**
