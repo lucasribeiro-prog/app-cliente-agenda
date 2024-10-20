@@ -1,9 +1,9 @@
 <template>
   <nav class="navbar">
       <ul>
-          <li><Link style="text-decoration: none;" href="/home">Início</Link></li>
-          <li><Link  style="text-decoration: none;" href="/agendar">Agendar</Link></li>
-          <li><Link  style="text-decoration: none;" href="/consultar">Consultar</Link></li>
+          <li><Link href="/home">Início</Link></li>
+          <li><Link href="/agendar">Agendar</Link></li>
+          <li><Link href="/consultar">Consultar</Link></li>
       </ul>
 
         <!-- Botão de perfil e logout -->
@@ -79,8 +79,5 @@ ul {
 li a {
   color: #fff;
   text-decoration: none;
-}
-li a:hover {
-  text-decoration: underline;
 }
 </style>
