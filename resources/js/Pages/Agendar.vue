@@ -1,6 +1,8 @@
 <template>
-    <div class="container">
+    <div>
         <Navbar />
+
+        <div class="container">
         <h1 style="margin-bottom: 20px; margin-top: 10px;"><b>Agendar Atendimento</b></h1>
         <form @submit.prevent="submitForm">
             <input type="text" v-model="nome" placeholder="Nome" required />
@@ -24,6 +26,7 @@
             <input type="hidden" :value="id_usuario" />
             <button type="submit">Agendar</button>
         </form>
+    </div>
     </div>
 </template>
 
@@ -100,7 +103,3 @@ export default {
 
 };
 </script>
-
-<style>
-/* Estilos específicos da página de agendamento (opcional) */
-</style>
