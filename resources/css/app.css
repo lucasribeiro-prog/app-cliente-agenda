@@ -62,7 +62,8 @@ input, select, textarea {
 /* Estilo para inputs de texto */
 input[type="text"],
 input[type="tel"],
-input[type="date"] {
+input[type="date"],
+input[type="time"] {
     border-color: #333; /* Cor da borda */
     border-radius: 5px; /* Arredondamento nas bordas */
 }

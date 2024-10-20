@@ -6,9 +6,10 @@ use App\Models\Agendamento;
 use App\Models\Cliente;
 use App\Models\Contato;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Crypt;
-use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
+use Inertia\Inertia;
 
 class AgendamentoController extends Controller
 {
@@ -42,10 +43,13 @@ class AgendamentoController extends Controller
      */
     public function store(Request $request)
     {
+        $horaFormatada = Carbon::createFromFormat('H:i', $request->get('hora'))->format('H:i:s');
+
         //Formatando o cpf e telefone
         $request->merge([
             'cpf' => preg_replace('/[^0-9]/', '', $request->get('cpf')),
-            'telefone' => preg_replace('/[^0-9]/', '', $request->input('telefone')), 
+            'telefone' => preg_replace('/[^0-9]/', '', $request->input('telefone')),
+            'hora' => $horaFormatada,
         ]);
 
         //Validando os dados
@@ -85,7 +89,10 @@ class AgendamentoController extends Controller
      */
     public function show(Agendamento $agendamento)
     {
-        //
+        $id_usuario = Auth::id();
+        return Inertia::render('Agendar', [
+            'id_usuario' => $id_usuario,
+        ]);
     }
 
     /**

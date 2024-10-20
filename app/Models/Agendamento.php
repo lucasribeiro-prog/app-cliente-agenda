@@ -22,7 +22,7 @@ class Agendamento extends Model
     public static function rules()
     {
         return [
-            'usuario'  => 'exists:user,id',
+            'id_usuario'  => 'exists:users,id',
             'nome' => 'required|min:3|max:40',
             'cpf' => 'required|size:11|unique:clientes,cpf',
             'matricula' => 'required',
