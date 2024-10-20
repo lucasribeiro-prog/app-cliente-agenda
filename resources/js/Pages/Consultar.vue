@@ -28,7 +28,7 @@
                 <td>{{ agendamento.clientes.nome }}</td>
                 <td>{{ agendamento.usuarios.name }}</td> 
                 <td>
-                  <button @click="viewDetails(agendamento.id)">Detalhes</button>
+                  <button class="detalhes" @click="viewDetails(agendamento.id)">Detalhes</button>
                 </td>
               </tr>
             </tbody>
@@ -146,7 +146,7 @@ td {
   text-align: center;;
 }
 
-button {
+.detalhes {
   background-color: #28a745;
   color: white;
   border: none;
@@ -155,7 +155,7 @@ button {
   margin-left: 10px;
 }
 
-button:hover {
+.detalhes:hover {
   background-color: #218838;
 }
 

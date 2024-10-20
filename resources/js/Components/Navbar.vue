@@ -80,4 +80,14 @@ li a {
   color: #fff;
   text-decoration: none;
 }
+
+button {
+  background-color: #fff;
+  color: #000000;
+}
+
+button:hover {
+  background-color: #0056b3;
+  color: #fff;
+}
 </style>
