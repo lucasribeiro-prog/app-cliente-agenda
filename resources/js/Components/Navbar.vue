@@ -6,7 +6,7 @@
           <li><Link  style="text-decoration: none;" href="/consultar">Consultar</Link></li>
       </ul>
 
-        <!-- Adicionando o botão de perfil e logout -->
+        <!-- Botão de perfil e logout -->
         <div class="hidden sm:ms-6 sm:flex sm:items-center">
             <!-- Settings Dropdown -->
             <div class="relative ms-3">
@@ -37,7 +37,7 @@
                   <template #content>
                     
                     <DropdownLink :href="route('logout')" method="post" as="button">
-                        Log Out
+                        Sair
                     </DropdownLink>
                   </template>
               </Dropdown>
@@ -47,14 +47,14 @@
 </template>
 
 <script>
-import { Link } from '@inertiajs/vue3'; // Importa o componente Link do Inertia
+import { Link } from '@inertiajs/vue3';
 import Dropdown from '@/Components/Dropdown.vue';
 import DropdownLink from '@/Components/DropdownLink.vue';
 
 export default {
   name: "Navbar",
   components: {
-    Link, // Registre o componente Link aqui
+    Link,
     Dropdown,
     DropdownLink
   },
@@ -68,6 +68,7 @@ export default {
   align-items: center;
   background-color: #333;
   padding: 1em;
+  border-radius: 0%;
 }
 ul {
   list-style: none;
