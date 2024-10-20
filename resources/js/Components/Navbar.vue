@@ -1,9 +1,9 @@
 <template>
   <nav class="navbar">
       <ul>
-          <li><Link href="/home">Início</Link></li>
-          <li><Link href="/agendar">Agendar</Link></li>
-          <li><Link href="/consultar">Consultar</Link></li>
+          <li class="home"><Link href="/home">Início</Link></li>
+          <li class="agendar"><Link href="/agendar">Agendar</Link></li>
+          <li class="consultar"><Link  href="/consultar">Consultar</Link></li>
       </ul>
 
         <!-- Botão de perfil e logout -->

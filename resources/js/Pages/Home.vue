@@ -1,9 +1,14 @@
 <template>
-  <div class="container">
-      <Navbar />
+  <div id="home">
+    <Navbar />
+
+    <div class="container">
       <h1>Bem-vindo ao Sistema de Agendamentos</h1>
       <p>Utilize o menu para navegar entre as páginas.</p>
+    </div>
+  
   </div>
+
 </template>
 
 <script>
@@ -16,7 +21,3 @@ export default {
   },
 };
 </script>
-
-<style>
-/* Estilos específicos da página inicial (opcional) */
-</style>

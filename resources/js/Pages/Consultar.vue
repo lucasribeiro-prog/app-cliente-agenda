@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div id="consultar">
     <!-- Navbar -->
     <Navbar />
 
@@ -105,7 +105,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style>
 .container {
   max-width: 1200px;
   margin: 0 auto;
