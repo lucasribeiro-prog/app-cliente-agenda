@@ -1,6 +1,6 @@
 Sistema de Agendamentos*
 
-Este projeto é um Sistema de Agendamentos construído com Laravel 10 e Vue 3 (instalado via Breeze e Vite). O sistema permite que os usuários agendem serviços, preenchendo informações como nome, telefone, CPF, tipo de atendimento, e outros detalhes.
+Este projeto é um Sistema de Agendamentos construído com Laravel 11 e Vue 3 (instalado via Breeze e Vite). O sistema permite que os usuários agendem serviços, preenchendo informações como nome, telefone, CPF, tipo de atendimento, e outros detalhes.
 
 *Funcionalidades*
 
