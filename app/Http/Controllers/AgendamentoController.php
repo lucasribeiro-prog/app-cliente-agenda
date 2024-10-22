@@ -87,12 +87,9 @@ class AgendamentoController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Agendamento $agendamento)
+    public function show(Agendamento $agendar)
     {
-        $id_usuario = Auth::id();
-        return Inertia::render('Agendar', [
-            'id_usuario' => $id_usuario,
-        ]);
+        //
     }
 
     /**
