@@ -57,8 +57,8 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
-import Navbar from '../components/Navbar.vue';
-import Modal from '../components/Modal.vue';
+import Navbar from '../Components/Navbar.vue';
+import Modal from '../Components/Modal.vue';
 import axios from 'axios';
 import { usePage } from '@inertiajs/vue3';
 

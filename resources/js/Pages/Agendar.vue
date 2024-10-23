@@ -34,7 +34,7 @@
 <script>
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
-import Navbar from '../components/Navbar.vue';
+import Navbar from '../Components/Navbar.vue';
 import { usePage } from '@inertiajs/vue3';
 
 export default {
