@@ -7,6 +7,7 @@ import { createApp, h } from 'vue';
 import { ZiggyVue } from '../../vendor/tightenco/ziggy';
 import router from './router'; // Importando o roteador
 import Navbar from './Components/Navbar.vue';
+import '@fortawesome/fontawesome-free/css/all.css';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
