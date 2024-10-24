@@ -67,8 +67,6 @@ class AgendamentoController extends Controller
         $contato->telefone = $request->get('telefone');
         $contato->save();
 
-        $usuario  =  new User();
-
         $agendamento = new Agendamento();
         $agendamento->id_usuario = $request->get('id_usuario');
         $agendamento->id_cliente = $cliente->id;
@@ -103,9 +101,40 @@ class AgendamentoController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Agendamento $agendamento)
+    public function update(Request $request, Agendamento $agendar)
     {
-        //
+        $horaFormatada = Carbon::createFromFormat('H:i', $request->get('hora'))->format('H:i:s');
+
+        $agendamento = $agendar->load([
+            'clientes:id,nome,cpf,matricula',
+            'contatos:id,telefone',
+        ]);
+
+        //Formatando o cpf e telefone
+        $request->merge([
+            'cpf' => preg_replace('/[^0-9]/', '', $request->get('cpf')),
+            'telefone' => preg_replace('/[^0-9]/', '', $request->get('telefone')),
+            'hora' => $horaFormatada,
+        ]);
+
+        $cliente = $agendamento->clientes;
+        $cliente->nome = $request->get('nome');
+        $cliente->cpf = $request->get('cpf');
+        $cliente->matricula = $request->get('matricula');
+        $cliente->save();
+
+        $contato = $agendamento->contatos;
+        $contato->telefone = $request->get('telefone');
+        $contato->save();
+
+        $agendamento->data = $request->get('data');
+        $agendamento->hora = $request->get('hora');
+        $agendamento->save();
+
+        return response()->json([
+            'sucesso' => 'Dados atualizados com sucesso.',
+            'agendamento' => $agendamento,
+        ], 200);
     }
 
     /**
