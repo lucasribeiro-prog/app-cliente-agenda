@@ -103,7 +103,6 @@ class AgendamentoController extends Controller
      */
     public function update(Request $request, Agendamento $agendar)
     {
-        $horaFormatada = Carbon::createFromFormat('H:i', $request->get('hora'))->format('H:i:s');
 
         $agendamento = $agendar->load([
             'clientes:id,nome,cpf,matricula',
@@ -114,7 +113,6 @@ class AgendamentoController extends Controller
         $request->merge([
             'cpf' => preg_replace('/[^0-9]/', '', $request->get('cpf')),
             'telefone' => preg_replace('/[^0-9]/', '', $request->get('telefone')),
-            'hora' => $horaFormatada,
         ]);
 
         $cliente = $agendamento->clientes;

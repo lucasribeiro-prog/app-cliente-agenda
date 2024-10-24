@@ -28,7 +28,8 @@
                 <td>{{ agendamento.clientes.nome }}</td>
                 <td>{{ agendamento.usuarios.name }}</td>
                 <td>
-                  <button class="detalhes" @click="viewDetails(agendamento)">Detalhes</button>
+                  <button class="detalhes bg-gray-500" @click="viewDetails(agendamento)">Detalhes</button>
+                  <button class="editar bg-teal-500" @click="editar(agendamento)">Editar</button>
                 </td>
               </tr>
             </tbody>
@@ -38,7 +39,7 @@
     </div>
 
     <!-- Modal para exibir detalhes do agendamento -->
-    <Modal :show="showModal" @close="showModal = false">
+    <Modal :show="showDetailsModal" @close="showDetailsModal = false">
       <template v-if="selectedAgendamento">
         <h1 class="text-center text-2xl font-bold mb-10">{{ selectedAgendamento.clientes.nome }}</h1>
         <p><strong>CPF:</strong> {{ selectedAgendamento.clientes.cpf }}</p>
@@ -46,10 +47,27 @@
         <p><strong>Data do leilão:</strong> {{ selectedAgendamento.data_leilao }}</p>
         <p>
           <strong>Matrícula:</strong>
-          <a href="selectedAgendamento.clientes.matricula" class="ml-2" target="_blank">
+          <a :href="selectedAgendamento.clientes.matricula" class="ml-2" target="_blank">
             <i class="fa-regular fa-file-pdf text-lg"></i>
           </a>
         </p>
+      </template>
+    </Modal>
+
+    <!-- Modal edição do agendamento -->
+    <Modal :show="showEditModal" @close="showEditModal = false">
+      <template v-if="selectedAgendamento">
+        <h1 class="text-center text-2xl font-bold mb-10">Editar Agendamento</h1>
+        <form @submit.prevent="submitForm">
+          <input type="hidden" v-model="selectedAgendamento.id" placeholder="Nome" required />
+          <input type="text" v-model="selectedAgendamento.clientes.nome" placeholder="Nome" required />
+          <input type="tel" v-model="selectedAgendamento.contatos.telefone" placeholder="Telefone" required />
+          <input type="text" v-model="selectedAgendamento.clientes.cpf" placeholder="CPF" required />
+          <input type="date" v-model="selectedAgendamento.data" required />
+          <input type="time" v-model="selectedAgendamento.hora" required />
+          <input type="text" v-model="selectedAgendamento.clientes.matricula" placeholder="Matrícula do Imóvel" required />
+          <button type="submit">Salvar</button>
+        </form>
       </template>
     </Modal>
   </div>
@@ -75,12 +93,43 @@ const days = ref([
   { name: 'Domingo', isOpen: false, agendamentos: [] },
 ]);
 
-const showModal = ref(false); // Estado para controlar se o modal está aberto ou fechado
+const showDetailsModal  = ref(false);
+const showEditModal = ref(false);
 const selectedAgendamento = ref(null); // Agendamento selecionado para exibir os detalhes
+
+const message = ref('');
 
 const toggleDropdown = (index) => {
   days.value[index].isOpen = !days.value[index].isOpen;
 };
+
+const submitForm = async () => {
+  try {
+    const formData = {
+      id: selectedAgendamento.value.id,
+      nome: selectedAgendamento.value.clientes.nome,
+      telefone: selectedAgendamento.value.contatos.telefone,
+      cpf: selectedAgendamento.value.clientes.cpf,
+      data: selectedAgendamento.value.data,
+      hora: selectedAgendamento.value.hora,
+      matricula: selectedAgendamento.value.clientes.matricula,
+    };
+
+    const response = await axios.put(`http://localhost:8000/api/agendar/${selectedAgendamento.value.id}`, formData);
+
+    // Atualiza o agendamento localmente e recarrega os agendamentos
+    await buscarAgendamentos();
+
+    // Limpar seleção e fechar modal
+    selectedAgendamento.value = null;
+    showEditModal.value = false;
+
+  } catch (error) {
+    console.error('Erro ao tentar atualizar os dados:', error);
+    message.value = 'Erro ao tentar atualizar os dados.';
+  }
+};
+       
 
 const buscarAgendamentos = async () => {
   try {
@@ -104,8 +153,13 @@ const buscarAgendamentos = async () => {
 };
 
 const viewDetails = (agendamento) => {
-  selectedAgendamento.value = agendamento; // Armazena o agendamento selecionado
-  showModal.value = true; // Abre o modal
+  selectedAgendamento.value = agendamento;
+  showDetailsModal.value = true;
+};
+
+const editar = (agendamento) => {
+  selectedAgendamento.value = { ...agendamento };
+  showEditModal.value = true;
 };
 
 onMounted(() => {
@@ -155,7 +209,6 @@ td {
 }
 
 .detalhes {
-  background-color: #28a745;
   color: white;
   border: none;
   padding: 0.5rem 1rem;
@@ -164,12 +217,20 @@ td {
 }
 
 .detalhes:hover {
-  background-color: #218838;
+  background-color: #374151;
 }
 
 .button-modal  {
   display: flex;
   justify-content: center;
+}
+
+.editar:hover {
+  background-color: #0d9488;
+}
+
+button {
+  margin-right: 10px;
 }
 
 h1 {
