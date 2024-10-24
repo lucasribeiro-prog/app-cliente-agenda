@@ -4,7 +4,8 @@ import Schedule from '../Pages/Agendar.vue';
 import Consult from '../Pages/Consultar.vue';
 
 const routes = [
-  { path: '/', component: Home, name: 'home' },
+  { path: '/', component: Home, name: 'login' },
+  { path: '/home', component: Home, name: 'home' },
   { path: '/agendar', component: Schedule, name: 'schedule' },
   { path: '/consultar', component: Consult, name: 'consult' },
 ];
