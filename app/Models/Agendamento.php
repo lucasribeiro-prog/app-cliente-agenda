@@ -9,6 +9,7 @@ use App\Models\Atendimento;
 use App\Models\Categoria;
 use App\Models\Cliente;
 use App\Models\Contato;
+use App\Models\StatusAgendamento;
 
 class Agendamento extends Model
 {
@@ -72,8 +73,8 @@ class Agendamento extends Model
         return $this->belongsTo(Atendimento::class, 'id_atendimento');
     }
 
-    public function statusAgendamento()
+    public function status_agendamentos()
     {
-        return $this->belongsTo(StatusAgendamento::class, 'status_agendamento_id');
+        return $this->belongsTo(StatusAgendamento::class, 'id_status');
     }
 }

@@ -120,7 +120,7 @@ const days = ref([
 const showDetailsModal  = ref(false);
 const showEditModal = ref(false);
 const showStatusModal = ref(false);
-const selectedAgendamento = ref(null); // Agendamento selecionado para exibir os detalhes
+const selectedAgendamento = ref(null);
 const modalTipo = ref('');
 const observacao = ref('');
 const message = ref('');
@@ -171,7 +171,9 @@ const buscarAgendamentos = async () => {
     agendamentos.forEach(agendamento => {
       const date = new Date(agendamento.data);
       const weekDayIndex = date.getDay();
-      days.value[weekDayIndex].agendamentos.push(agendamento);
+      if(agendamento.id_status == null) {
+        days.value[weekDayIndex].agendamentos.push(agendamento);
+      }
     });
   } catch (error) {
     console.error('Erro ao carregar agendamentos:', error);
@@ -179,22 +181,15 @@ const buscarAgendamentos = async () => {
 };
 
 const submitStatus = async () => {
-  const status = modalTipo.value === 'atendido' ? 'Aguardando retorno' : 'Remarcar';
+  const status = modalTipo.value === 'atendido' ? 3 : 2;
 
   try {
-    /*console.log('Dados enviados:', {
-    agendamento_id: selectedAgendamento.value.id,
-    status: status,
-    observacao: observacao.value,
-  });*/
-
-    await axios.post('/api/update-appointment-status', {
+    await axios.post('http://localhost:8000/api/agendar', {
       agendamento_id: selectedAgendamento.value.id,
       status: status,
       observacao: observacao.value,
     });
 
-    alert('Status atualizado com sucesso!');
     showStatusModal.value = false;
 
     await buscarAgendamentos();
