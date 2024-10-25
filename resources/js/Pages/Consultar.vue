@@ -28,8 +28,21 @@
                 <td>{{ agendamento.clientes.nome }}</td>
                 <td>{{ agendamento.usuarios.name }}</td>
                 <td>
-                  <button class="detalhes bg-gray-500" @click="viewDetails(agendamento)">Detalhes</button>
-                  <button class="editar bg-teal-500" @click="editar(agendamento)">Editar</button>
+                  <button class="detalhes bg-gray-600" @click="viewDetails(agendamento)" title="Detalhes">
+                    <i class="fas fa-eye"></i>
+                  </button>
+
+                  <button class="editar bg-teal-500" @click="editar(agendamento)" title="Editar">
+                    <i class="fas fa-pencil-alt"></i>
+                  </button>
+
+                  <button class="atendido bg-green-400" @click="openModal(agendamento, 'atendido')" title="Atendido">
+                    <i class="fas fa-check"></i>
+                  </button>
+
+                  <button class="nao-compareceu bg-red-500" @click="openModal(agendamento, 'nao_compareceu')" title="Não Compareceu">
+                    <i class="fas fa-times"></i>
+                  </button>
                 </td>
               </tr>
             </tbody>
@@ -70,6 +83,17 @@
         </form>
       </template>
     </Modal>
+
+    <!-- Modal de status do atendimento -->
+    <Modal :show="showStatusModal" @close="showStatusModal = false">
+      <template v-if="selectedAgendamento">
+        <h2 class="font-bold text-lg">{{ modalTipo === 'atendido' ? 'Cliente Atendido' : 'Não Compareceu' }}</h2>
+        <p class="mb-9">{{ selectedAgendamento.clientes.nome }} - {{ selectedAgendamento.hora }}</p>
+        <textarea v-model="observacao" placeholder="Escreva uma observação (opcional)"></textarea>
+        <button @click="submitStatus">Enviar</button>
+      </template>
+    </Modal>
+    
   </div>
 </template>
 
@@ -95,8 +119,10 @@ const days = ref([
 
 const showDetailsModal  = ref(false);
 const showEditModal = ref(false);
+const showStatusModal = ref(false);
 const selectedAgendamento = ref(null); // Agendamento selecionado para exibir os detalhes
-
+const modalTipo = ref('');
+const observacao = ref('');
 const message = ref('');
 
 const toggleDropdown = (index) => {
@@ -152,6 +178,31 @@ const buscarAgendamentos = async () => {
   }
 };
 
+const submitStatus = async () => {
+  const status = modalTipo.value === 'atendido' ? 'em_andamento' : 'aguardando_retorno';
+
+  try {
+    /*console.log('Dados enviados:', {
+    agendamento_id: selectedAgendamento.value.id,
+    status: status,
+    observacao: observacao.value,
+  });*/
+
+    await axios.post('/api/update-appointment-status', {
+      agendamento_id: selectedAgendamento.value.id,
+      status: status,
+      observacao: observacao.value,
+    });
+
+    alert('Status atualizado com sucesso!');
+    showStatusModal.value = false;
+
+    await buscarAgendamentos();
+  } catch (error) {
+    console.error('Erro ao atualizar status:', error);
+  }
+};
+
 const viewDetails = (agendamento) => {
   selectedAgendamento.value = agendamento;
   showDetailsModal.value = true;
@@ -160,6 +211,18 @@ const viewDetails = (agendamento) => {
 const editar = (agendamento) => {
   selectedAgendamento.value = { ...agendamento };
   showEditModal.value = true;
+};
+
+const openModal = (agendamento, tipo) => {
+  selectedAgendamento.value = agendamento;
+  modalTipo.value = tipo;
+  showStatusModal.value = true;
+};
+
+const closeModal = () => {
+  showStatusModal.value = false;
+  selectedAgendamento.value = null;
+  observacao.value = '';
 };
 
 onMounted(() => {
@@ -227,6 +290,14 @@ td {
 
 .editar:hover {
   background-color: #0d9488;
+}
+
+.atendido:hover {
+  background-color: #38a169;
+}
+
+.nao-compareceu:hover {
+ background-color: #c53030;
 }
 
 button {
