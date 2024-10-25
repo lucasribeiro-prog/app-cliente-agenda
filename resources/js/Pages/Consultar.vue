@@ -179,7 +179,7 @@ const buscarAgendamentos = async () => {
 };
 
 const submitStatus = async () => {
-  const status = modalTipo.value === 'atendido' ? 'em_andamento' : 'aguardando_retorno';
+  const status = modalTipo.value === 'atendido' ? 'Aguardando retorno' : 'Remarcar';
 
   try {
     /*console.log('Dados enviados:', {
