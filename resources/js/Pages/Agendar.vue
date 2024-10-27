@@ -77,8 +77,6 @@ export default {
             const response = await axios.post('http://localhost:8000/api/agendar', formData);
             
             message.value = response.data.message;
-            
-            localIdUsuario.value = '';
             nome.value = '';
             telefone.value = '';
             cpf.value = '';
