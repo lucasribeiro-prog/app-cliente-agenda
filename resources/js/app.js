@@ -7,6 +7,7 @@ import { createApp, h } from 'vue';
 import { ZiggyVue } from '../../vendor/tightenco/ziggy';
 import router from './router';
 import Navbar from './Components/Navbar.vue';
+import Sidebar from './Components/Sidebar.vue';
 import Modal from './Components/Modal.vue';
 import '@fortawesome/fontawesome-free/css/all.css';
 
@@ -23,7 +24,7 @@ createInertiaApp({
     setup({ el, App, props, plugin }) {
         const app = createApp({
             render: () => h(App, props),
-            components: { Navbar, Modal },
+            components: { Navbar, Modal, Sidebar },
         });
 
         app.use(plugin);
