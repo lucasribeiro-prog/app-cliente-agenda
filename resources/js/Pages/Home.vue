@@ -1,15 +1,15 @@
 <template>
   <div id="home">
-
     <Navbar />
     <div class="container">
+      <!-- Renderizando Sidebar independentemente do type inicial -->
       <Sidebar 
-      :currentTableType="currentTable.type" 
-      :headerColors="headerColors" 
-      @load-table="loadTable" />
+        :currentTableType="currentTable.type" 
+        :headerColors="headerColors" 
+        @load-table="loadTable" />
       <div class="content">
         <div v-if="currentTable">
-          <h2>{{ currentTable.title }}</h2>
+          <h2 class="text-center text-2xl font-bold">{{ currentTable.title }}</h2>
           <table>
             <thead>
               <tr :style="{ backgroundColor: headerColor }">
@@ -34,10 +34,13 @@
   </div>
 </template>
 
+
 <script>
+import { onMounted } from 'vue';
 import { ref } from 'vue';
 import Navbar from '../Components/Navbar.vue';
 import Sidebar from '../Components/Sidebar.vue';
+import axios from 'axios';
 
 export default {
   name: "Home",
@@ -48,37 +51,10 @@ export default {
   setup() {
     const currentTable = ref({
       type: 'aguardando',
-      title: "Aguardando Retorno",
-      data: [
-        { client: "Cliente 1", consultor: "Consultor 1", id: 1 },
-        { client: "Cliente 2", consultor: "Consultor 2", id: 2 },
-      ],
+      title: "Aguardando retorno",
+      data: [],
     });
     const headerColor = ref('rgb(20 184 166)');
-
-    const tablesData = {
-      aguardando: {
-        title: "Aguardando Retorno",
-        data: [
-          { client: "Cliente 1", consultor: "Consultor 1", id: 1 },
-          { client: "Cliente 2", consultor: "Consultor 2", id: 2 },
-        ],
-      },
-      andamento: {
-        title: "Em Andamento",
-        data: [
-          { client: "Cliente 3", consultor: "Consultor 3", id: 3 },
-          { client: "Cliente 4", consultor: "Consultor 4", id: 4 },
-        ],
-      },
-      remarcar: {
-        title: "Remarcar",
-        data: [
-          { client: "Cliente 5", consultor: "Consultor 5", id: 5 },
-          { client: "Cliente 6", consultor: "Consultor 6", id: 6 },
-        ],
-      },
-    };
 
     const headerColors = {
       aguardando: 'rgb(20 184 166)',
@@ -86,12 +62,33 @@ export default {
       remarcar: 'rgb(239 68 68)',
     };
 
-    const loadTable = (type) => {
-      currentTable.value = {
-        type: type,
-        ...tablesData[type],
-      };
+    const statusMap = {
+      andamento: 1,
+      remarcar: 2,
+      aguardando: 3,
+    };
+
+    const loadTable = async (type) => {
+      currentTable.value.type = type;
+      currentTable.value.title = '';
+      currentTable.value.data = [];
       headerColor.value = headerColors[type];
+
+      try {
+        const response = await axios.get(`http://localhost:8000/api/agendar`);
+        const filteredData = response.data.filter(item => item.id_status === statusMap[type]);
+        currentTable.value = {
+          ...currentTable.value,
+          title: type === 'aguardando' ? "Aguardando Retorno" : type === 'andamento' ? "Em Andamento" : "Remarcar",
+          data: filteredData.map(item => ({
+            client: item.clientes.nome,
+            consultor: item.usuarios.name,
+            id: item.id
+          })),
+        };
+      } catch (error) {
+        console.error('Erro ao carregar dados da tabela:', error);
+      }
     };
 
     const viewDetails = (id) => {
@@ -99,6 +96,10 @@ export default {
       // Pode usar this.$inertia.visit(`/detalhes/${id}`);
       alert(`Exibir detalhes para o cliente com ID: ${id}`);
     };
+
+    onMounted(() => {
+      loadTable('aguardando'); // Define 'aguardando' como o tipo inicial
+    });
 
     return {
       currentTable,

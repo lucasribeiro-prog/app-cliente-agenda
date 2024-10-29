@@ -1,27 +1,33 @@
 <template>
   <nav class="sidebar">
     <ul>
-      <li @click="selectTable('aguardando')" 
-      :style="{ 
-        backgroundColor: currentTableType === 'aguardando' ? '#d0d4d6' : '',
-        color: currentTableType === 'aguardando' ? '#000' : ''
+      <li 
+        @click="selectTable('aguardando')" 
+        :style="{ 
+          backgroundColor: currentTableType === 'aguardando' ? '#d0d4d6' : '',
+          color: currentTableType === 'aguardando' ? '#000' : ''
         }">
+        <i v-show="currentTableType === 'aguardando'" class="fa-solid fa-arrow-right mr-3"></i>
         Aguardando Retorno
       </li>
 
-      <li  @click="selectTable('andamento')" 
-      :style="{ 
-        backgroundColor: currentTableType === 'andamento' ? '#d0d4d6' : '',
-        color: currentTableType === 'andamento' ? '#000' : '' 
+      <li 
+        @click="selectTable('andamento')" 
+        :style="{ 
+          backgroundColor: currentTableType === 'andamento' ? '#d0d4d6' : '',
+          color: currentTableType === 'andamento' ? '#000' : '' 
         }">
+        <i v-show="currentTableType === 'andamento'" class="fa-solid fa-arrow-right mr-3"></i>
         Em Andamento
       </li>
 
-      <li  @click="selectTable('remarcar')" 
-      :style="{ 
-        backgroundColor: currentTableType === 'remarcar' ? '#d0d4d6' : '',
-        color: currentTableType === 'remarcar' ? '#000' : '' 
+      <li 
+        @click="selectTable('remarcar')" 
+        :style="{ 
+          backgroundColor: currentTableType === 'remarcar' ? '#d0d4d6' : '',
+          color: currentTableType === 'remarcar' ? '#000' : '' 
         }">
+        <i v-show="currentTableType === 'remarcar'" class="fa-solid fa-arrow-right mr-3"></i>
         Remarcar
       </li>
     </ul>
@@ -36,6 +42,7 @@ export default defineComponent({
   props: {
     currentTableType: {
       type: String,
+      default: '',
       required: true,
     },
     headerColors: {
