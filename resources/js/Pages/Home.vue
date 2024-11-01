@@ -23,7 +23,13 @@
                 <td>{{ item.client }}</td>
                 <td>{{ item.consultor }}</td>
                 <td>
-                  <button @click="viewDetails(item.id)">Detalhes</button>
+                  <button class="detalhes bg-gray-600" @click="viewDetails(item.id)" title="Detalhes">
+                    <i class="fas fa-eye"></i>
+                  </button>
+
+                  <button v-if="currentTable.type === 'remarcar'" class="detalhes bg-gray-600" @click="reschedule(item.id)" title="Remarcar">
+                    <i class="fas fa-undo"></i>
+                  </button>
                 </td>
               </tr>
             </tbody>
@@ -31,6 +37,35 @@
         </div>
       </div>
     </div>
+
+    <!-- Modal que exibe os detalhes do cliente -->
+    <Modal :show="showDetailsModal" @close="showDetailsModal = false">
+      <template v-if="selectedAgendamento">
+        <h1 class="text-center text-2xl font-bold mb-10">{{ selectedAgendamento.client }}</h1>
+        <p><strong>CPF:</strong> {{ selectedAgendamento.cpf }}</p>
+        <p><strong>Telefone:</strong> {{ selectedAgendamento.telefone }}</p>
+        <p><strong>Data do leilão:</strong> {{ selectedAgendamento.data_leilao }}</p>
+        <p>
+          <strong>Matrícula:</strong>
+          <a :href="selectedAgendamento.matricula" class="ml-2" target="_blank">
+            <i class="fa-regular fa-file-pdf text-lg"></i>
+          </a>
+        </p>
+      </template>
+    </Modal>
+
+    <!-- Modal que exibe o formulario para reagendar o cliente -->
+    <Modal :show="showRescheduleModal" @close="showRescheduleModal = false">
+      <template v-if="selectedAgendamento">
+        <h1 class="text-center text-2xl font-bold mb-10">Remarcar</h1>
+        <form @submit.prevent="submitForm">
+          <input type="hidden" v-model="selectedAgendamento.id" placeholder="Id" required />
+          <input type="date" v-model="selectedAgendamento.data" required />
+          <input type="time" v-model="selectedAgendamento.hora" required />
+          <button type="submit">Agendar</button>
+        </form>
+      </template>
+    </Modal>
   </div>
 </template>
 
@@ -41,12 +76,14 @@ import { ref } from 'vue';
 import Navbar from '../Components/Navbar.vue';
 import Sidebar from '../Components/Sidebar.vue';
 import axios from 'axios';
+import Modal from '../Components/Modal.vue';
 
 export default {
   name: "Home",
   components: {
     Navbar,
     Sidebar,
+    Modal,
   },
   setup() {
     const currentTable = ref({
@@ -55,7 +92,9 @@ export default {
       data: [],
     });
     const headerColor = ref('rgb(20 184 166)');
-
+    const showDetailsModal  = ref(false);
+    const showRescheduleModal  = ref(false);
+    const selectedAgendamento = ref(null);
     const headerColors = {
       aguardando: 'rgb(20 184 166)',
       andamento: 'rgb(74 222 128)',
@@ -82,7 +121,11 @@ export default {
           title: type === 'aguardando' ? "Aguardando Retorno" : type === 'andamento' ? "Em Andamento" : "Remarcar",
           data: filteredData.map(item => ({
             client: item.clientes.nome,
+            cpf: item.clientes.cpf,
+            telefone: item.contatos.telefone,
             consultor: item.usuarios.name,
+            data_leilao: item.data_leilao,
+            matricula: item.clientes.matricula,
             id: item.id
           })),
         };
@@ -91,22 +134,62 @@ export default {
       }
     };
 
+    const selectAgendamento = (id, modalType) => {
+      const item = currentTable.value.data.find(dataItem => dataItem.id === id);
+      if (item) {
+        selectedAgendamento.value = item;
+        if (modalType === 'details') {
+          showDetailsModal.value = true;
+        } else if (modalType === 'reschedule') {
+          showRescheduleModal.value = true;
+        }
+      }
+    };
+
     const viewDetails = (id) => {
-      // Navegar para a página de detalhes com o ID
-      // Pode usar this.$inertia.visit(`/detalhes/${id}`);
-      alert(`Exibir detalhes para o cliente com ID: ${id}`);
+      selectAgendamento(id, 'details');
+    };
+
+    const reschedule = (id) => {
+      selectAgendamento(id, 'reschedule');
+    };
+
+    const submitForm = async () => {
+      try {
+        const formData = {
+          id: selectedAgendamento.value.id,
+          data: selectedAgendamento.value.data,
+          hora: selectedAgendamento.value.hora,
+        };
+
+        const response = await axios.put(`http://localhost:8000/api/agendar/${selectedAgendamento.value.id}/reschedule`, formData);
+
+        selectedAgendamento.value = null;
+        showRescheduleModal.value = false;
+
+        await loadTable('remarcar');
+
+      } catch (error) {
+        console.error('Erro ao tentar atualizar os dados:', error);
+        message.value = 'Erro ao tentar atualizar os dados.';
+      }
     };
 
     onMounted(() => {
-      loadTable('aguardando'); // Define 'aguardando' como o tipo inicial
+      loadTable('aguardando');
     });
 
     return {
       currentTable,
       loadTable,
       viewDetails,
+      reschedule,
+      submitForm,
       headerColor,
       headerColors,
+      selectedAgendamento,
+      showDetailsModal,
+      showRescheduleModal,
     };
   },
 };

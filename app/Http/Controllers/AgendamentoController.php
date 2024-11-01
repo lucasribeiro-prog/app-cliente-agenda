@@ -159,4 +159,18 @@ class AgendamentoController extends Controller
     {
         //
     }
+
+    public function reschedule(Request $request, Agendamento $agendar)
+    {
+        $agendar->data = $request->get('data');
+        $agendar->hora = $request->get('hora');
+        $agendar->id_status = null;
+        $agendar->save();
+
+        return response()->json([
+            'sucesso' => 'Reagendamento realizado com sucesso.',
+            'agendamento' => $agendar,
+        ], 200);
+    }
+
 }
