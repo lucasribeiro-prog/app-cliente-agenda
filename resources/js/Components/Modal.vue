@@ -24,11 +24,16 @@
               class="relative transform overflow-hidden rounded-lg bg-white shadow-xl transition-all sm:w-full"
               :class="maxWidthClass"
             >
+              <a href="#"
+                class="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+                @click="close"
+                aria-label="Close"
+              >
+                <i class="fas fa-times text-xl"></i>
+              </a>
+
               <div class="p-6">
                 <slot /> <!-- Usar slot para passar conteúdo do modal -->
-                <div class="flex justify-end mt-4">
-                  <button class="bg-blue-500 text-white px-4 py-2 rounded" @click="close">Fechar</button>
-                </div>
               </div>
             </div>
           </Transition>

@@ -55,7 +55,7 @@
     </Modal>
 
     <!-- Modal que exibe o formulario para reagendar o cliente -->
-    <Modal :show="showRescheduleModal" @close="showRescheduleModal = false">
+    <Modal :show="showRescheduleModal" @close="showRescheduleModal = false" maxWidth="sm">
       <template v-if="selectedAgendamento">
         <h1 class="text-center text-2xl font-bold mb-10">Remarcar</h1>
         <form @submit.prevent="submitForm">
