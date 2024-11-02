@@ -155,9 +155,10 @@ class AgendamentoController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Agendamento $agendamento)
+    public function destroy(Agendamento $agendar)
     {
-        //
+        $agendar->delete();
+        return ['msg' => 'Agendamento removido com sucesso!'];
     }
 
     public function reschedule(Request $request, Agendamento $agendar)

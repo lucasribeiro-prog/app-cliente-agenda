@@ -10,9 +10,12 @@ use App\Models\Categoria;
 use App\Models\Cliente;
 use App\Models\Contato;
 use App\Models\StatusAgendamento;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Agendamento extends Model
 {
+    use SoftDeletes;
+    
     protected $fillable = ['id_cliente', 'id_contato', 'categoria', 'data_leilao', 'data', 'hora'];
 
     public function getTelefoneAttribute($value)

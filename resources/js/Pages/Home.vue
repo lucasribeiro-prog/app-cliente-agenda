@@ -23,12 +23,16 @@
                 <td>{{ item.client }}</td>
                 <td>{{ item.consultor }}</td>
                 <td>
-                  <button class="detalhes bg-gray-600" @click="viewDetails(item.id)" title="Detalhes">
+                  <button class="detalhes bg-neutral-400" @click="viewDetails(item.id)" title="Detalhes">
                     <i class="fas fa-eye"></i>
                   </button>
 
-                  <button v-if="currentTable.type === 'remarcar'" class="detalhes bg-gray-600" @click="reschedule(item.id)" title="Remarcar">
+                  <button v-if="currentTable.type === 'remarcar'" class="detalhes bg-neutral-400" @click="reschedule(item.id)" title="Remarcar">
                     <i class="fas fa-undo"></i>
+                  </button>
+
+                  <button v-if="currentTable.type === 'remarcar'" class="delete bg-red-400 ml-2" @click="remover(item.id)" title="Remover">
+                    <i class="fa-solid fa-trash"></i>
                   </button>
                 </td>
               </tr>
@@ -66,6 +70,17 @@
         </form>
       </template>
     </Modal>
+
+    <!-- Modal que exibe o formulario para reagendar o cliente -->
+    <Modal :show="showDeleteModal" @close="showDeleteModal = false" maxWidth="sm">
+      <template v-if="selectedAgendamento">
+        <h1 class="text-center text-red-600 text-2xl font-bold mb-4">Atenção!</h1>
+        <p class="text-center mb-10 text-lg">Deseja remover o agendamento?</p>
+        <div class="flex justify-center">
+          <button @click="confirmarRemocao" class="delete bg-red-500 text-white py-2 px-4 rounded" type="button">Sim</button>
+        </div>
+      </template>
+    </Modal>
   </div>
 </template>
 
@@ -94,6 +109,7 @@ export default {
     const headerColor = ref('rgb(20 184 166)');
     const showDetailsModal  = ref(false);
     const showRescheduleModal  = ref(false);
+    const showDeleteModal = ref(false);
     const selectedAgendamento = ref(null);
     const headerColors = {
       aguardando: 'rgb(20 184 166)',
@@ -142,6 +158,8 @@ export default {
           showDetailsModal.value = true;
         } else if (modalType === 'reschedule') {
           showRescheduleModal.value = true;
+        } else if (modalType === 'remover') {
+          showDeleteModal.value =true;
         }
       }
     };
@@ -153,6 +171,24 @@ export default {
     const reschedule = (id) => {
       selectAgendamento(id, 'reschedule');
     };
+
+    const remover = (id) => {
+      selectAgendamento(id, 'remover');
+    }
+
+    const confirmarRemocao = async () => {
+      try {
+        await axios.delete(`http://localhost:8000/api/agendar/${selectedAgendamento.value.id}`);
+
+        showDeleteModal.value = false;
+        selectedAgendamento.value = null;
+
+        await loadTable(currentTable.value.type);
+
+      } catch (error) {
+        console.error('Erro ao tentar remover o agendamento:', error);
+      }
+    }
 
     const submitForm = async () => {
       try {
@@ -184,12 +220,15 @@ export default {
       loadTable,
       viewDetails,
       reschedule,
+      remover,
       submitForm,
       headerColor,
       headerColors,
       selectedAgendamento,
       showDetailsModal,
       showRescheduleModal,
+      showDeleteModal,
+      confirmarRemocao,
     };
   },
 };
@@ -205,6 +244,10 @@ export default {
 .content {
   padding: 20px;
   flex-grow: 1;
+}
+
+.delete:hover {
+  background-color: rgb(185 28 28);
 }
 
 thead th {
