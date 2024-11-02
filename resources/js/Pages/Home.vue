@@ -23,15 +23,15 @@
                 <td>{{ item.client }}</td>
                 <td>{{ item.consultor }}</td>
                 <td>
-                  <button class="detalhes bg-neutral-400" @click="viewDetails(item.id)" title="Detalhes">
+                  <button class="detalhes bg-neutral-600" @click="viewDetails(item.id)" title="Detalhes">
                     <i class="fas fa-eye"></i>
                   </button>
 
-                  <button v-if="currentTable.type === 'remarcar'" class="detalhes bg-neutral-400" @click="reschedule(item.id)" title="Remarcar">
+                  <button v-if="currentTable.type === 'remarcar'" class="detalhes bg-neutral-600" @click="reschedule(item.id)" title="Remarcar">
                     <i class="fas fa-undo"></i>
                   </button>
 
-                  <button v-if="currentTable.type === 'remarcar'" class="delete bg-red-400 ml-2" @click="remover(item.id)" title="Remover">
+                  <button v-if="currentTable.type === 'remarcar' || currentTable.type === 'aguardando'" class="detalhes bg-neutral-600 ml-2" @click="remover(item.id)" title="Remover">
                     <i class="fa-solid fa-trash"></i>
                   </button>
                 </td>
@@ -112,8 +112,8 @@ export default {
     const showDeleteModal = ref(false);
     const selectedAgendamento = ref(null);
     const headerColors = {
-      aguardando: 'rgb(20 184 166)',
-      andamento: 'rgb(74 222 128)',
+      aguardando: 'rgb(245 158 11)',
+      andamento: 'rgb(34 197 94)',
       remarcar: 'rgb(239 68 68)',
     };
 
