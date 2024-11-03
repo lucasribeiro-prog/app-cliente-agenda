@@ -52,7 +52,11 @@ class AgendamentoController extends Controller
             }
     
             $agendamento->id_status = $request->get('status');
-            $agendamento->observacao = $request->get('observacao');
+
+            if ($request->has('observacao')) {
+                $agendamento->observacao = $request->get('observacao');
+            }
+            
             $agendamento->save();
     
             return response()->json(['success' => true, 'message' => 'Status e observação atualizados com sucesso.', 'data' => $agendamento], 200);
