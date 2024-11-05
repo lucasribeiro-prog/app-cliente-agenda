@@ -32,15 +32,19 @@
                     <i class="fas fa-eye"></i>
                   </button>
 
-                  <button class="editar bg-teal-500" @click="editar(agendamento)" title="Editar">
+                  <button 
+                  class="editar bg-teal-500" 
+                  @click="editar(agendamento)" title="Editar"
+                  :disabled="user.id !== agendamento.usuarios.id && user.role !== 'admin'"
+                  :class="{ 'disabled-button': user.id !== agendamento.usuarios.id && user.role !== 'admin'}">
                     <i class="fas fa-pencil-alt"></i>
                   </button>
 
-                  <button class="atendido bg-green-400" @click="openModal(agendamento, 'atendido')" title="Atendido">
+                  <button v-if="user.role === 'admin'" class="atendido bg-green-400" @click="openModal(agendamento, 'atendido')" title="Atendido">
                     <i class="fas fa-check"></i>
                   </button>
 
-                  <button class="nao-compareceu bg-red-500" @click="openModal(agendamento, 'nao_compareceu')" title="Não Compareceu">
+                  <button v-if="user.role === 'admin'" class="nao-compareceu bg-red-500" @click="openModal(agendamento, 'nao_compareceu')" title="Não Compareceu">
                     <i class="fas fa-times"></i>
                   </button>
                 </td>
@@ -250,6 +254,16 @@ onMounted(() => {
   border: 1px solid #ccc;
   border-radius: 5px;
   padding: 1rem;
+}
+
+.disabled-button {
+  opacity: 0.5;
+  background-color: #c2c2c2;
+  cursor: not-allowed;
+}
+
+button.disabled-button:hover {
+  background-color: #c2c2c2;
 }
 
 table {

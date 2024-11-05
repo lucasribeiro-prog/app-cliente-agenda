@@ -20,7 +20,7 @@ class AgendamentoController extends Controller
     {
         
         $agendamentos = Agendamento::with([
-            'usuarios:id,name',
+            'usuarios:id,name,role',
             'clientes:id,nome,cpf,matricula',
             'contatos:id,telefone',
             'categorias:id,categoria',

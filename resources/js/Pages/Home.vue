@@ -104,7 +104,10 @@ export default {
     Sidebar,
     Modal,
   },
-  setup() {
+  props: {
+    auth: Object,
+  },
+  setup(props) {
     const currentTable = ref({
       type: 'aguardando',
       title: "Aguardando retorno",
@@ -135,7 +138,17 @@ export default {
 
       try {
         const response = await axios.get(`http://localhost:8000/api/agendar`);
-        const filteredData = response.data.filter(item => item.id_status === statusMap[type]);
+        const userId = props.auth.user.id;
+        const userRole = props.auth.user.role;
+
+        const filteredData = response.data.filter(item => {
+          if (userRole === 'admin') {
+            return item.id_status === statusMap[type];
+          } else {
+            return item.id_status === statusMap[type] && item.id_usuario === userId;
+          }
+        });
+
         currentTable.value = {
           ...currentTable.value,
           title: type === 'aguardando' ? "Aguardando Retorno" : type === 'andamento' ? "Em Andamento" : "Remarcar",
