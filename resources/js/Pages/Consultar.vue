@@ -24,7 +24,7 @@
             </thead>
             <tbody>
               <tr v-for="agendamento in day.agendamentos" :key="agendamento.id">
-                <td>{{ agendamento.hora }}</td>
+                <td>{{ formatarHora(agendamento.hora) }}</td>
                 <td>{{ agendamento.clientes.nome }}</td>
                 <td>{{ agendamento.usuarios.name }}</td>
                 <td>
@@ -59,9 +59,9 @@
     <Modal :show="showDetailsModal" @close="showDetailsModal = false">
       <template v-if="selectedAgendamento">
         <h1 class="text-center text-2xl font-bold mb-10">{{ selectedAgendamento.clientes.nome }}</h1>
-        <p><strong>CPF:</strong> {{ selectedAgendamento.clientes.cpf }}</p>
-        <p><strong>Telefone:</strong> {{ selectedAgendamento.contatos.telefone }}</p>
-        <p><strong>Data do leilão:</strong> {{ selectedAgendamento.data_leilao }}</p>
+        <p><strong>CPF:</strong> {{ formatarCPF(selectedAgendamento.clientes.cpf) }}</p>
+        <p><strong>Telefone:</strong> {{ formatarTelefone(selectedAgendamento.contatos.telefone) }}</p>
+        <p><strong>Data do leilão:</strong> {{ formatarData(selectedAgendamento.data_leilao) }}</p>
         <p>
           <strong>Matrícula:</strong>
           <a :href="selectedAgendamento.clientes.matricula" class="ml-2" target="_blank">
@@ -88,13 +88,29 @@
       </template>
     </Modal>
 
+    <!-- Modal para exibir feedback de atualização -->
+    <Modal :show="showFeedbackModal" @close="showFeedbackModal = false">
+      <!-- Ícone de Sucesso -->
+      <div class="mb-4">
+          <svg v-if="isError" class="w-12 h-12 text-red-500 mx-auto" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zM13 7h-2v6h2V7zm0 8h-2v2h2v-2z"/>
+          </svg>
+          <svg v-else class="w-12 h-12 text-green-500 mx-auto" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+              <path d="M12 0C5.372 0 0 5.373 0 12s5.372 12 12 12 12-5.373 12-12S18.628 0 12 0zm-1.533 17.025l-4.51-4.509 1.412-1.412 3.098 3.1 7.379-7.379 1.412 1.412-8.791 8.788z"/>
+          </svg>
+      </div>
+      <h1 :class="isError ? 'text-red-700' : 'text-green-700'" class="text-center text-2xl font-bold mb-2">
+          {{ isError ? 'Erro ao atualizar os dados' : 'Dados atualizados com sucesso!' }}
+      </h1>
+    </Modal>
+
     <!-- Modal de status do atendimento -->
     <Modal :show="showStatusModal" @close="showStatusModal = false">
       <template v-if="selectedAgendamento">
         <h2 class="font-bold text-lg">{{ modalTipo === 'atendido' ? 'Cliente Atendido' : 'Não Compareceu' }}</h2>
-        <p class="mb-9">{{ selectedAgendamento.clientes.nome }} - {{ selectedAgendamento.hora }}</p>
+        <p class="mb-9">{{ selectedAgendamento.clientes.nome }} - {{ formatarHora(selectedAgendamento.hora) }}</p>
         <textarea v-model="observacao" placeholder="Escreva uma observação (opcional)"></textarea>
-        <button @click="submitStatus">Enviar</button>
+        <button :class="modalTipo === 'atendido' ? 'bg-green-400' : 'bg-red-500'"  @click="submitStatus">Enviar</button>
       </template>
     </Modal>
     
@@ -121,9 +137,11 @@ const days = ref([
   { name: 'Domingo', isOpen: false, agendamentos: [] },
 ]);
 
+const showFeedbackModal  = ref(false);
 const showDetailsModal  = ref(false);
 const showEditModal = ref(false);
 const showStatusModal = ref(false);
+const isError = ref(false);
 const selectedAgendamento = ref(null);
 const modalTipo = ref('');
 const observacao = ref('');
@@ -146,6 +164,7 @@ const submitForm = async () => {
     };
 
     const response = await axios.put(`http://localhost:8000/api/agendar/${selectedAgendamento.value.id}`, formData);
+    message.value = response.data.message;
 
     // Atualiza o agendamento localmente e recarrega os agendamentos
     await buscarAgendamentos();
@@ -153,8 +172,22 @@ const submitForm = async () => {
     // Limpar seleção e fechar modal
     selectedAgendamento.value = null;
     showEditModal.value = false;
+    showFeedbackModal.value = true;
 
   } catch (error) {
+    if (error.response && error.response.status === 422) {
+      message.value = error.response.data.message || 'Erro ao processar o agendamento.';
+      
+      const errorDetails = error.response.data.errors;
+      if (errorDetails && errorDetails.data_leilao) {
+        message.value += ` ${errorDetails.data_leilao[0]}`;
+      }
+    } else {
+      message.value = 'Ocorreu um erro inesperado. Tente novamente mais tarde.';
+    }
+
+    isError.value = true;
+    showFeedbackModal.value = true;
     console.error('Erro ao tentar atualizar os dados:', error);
     message.value = 'Erro ao tentar atualizar os dados.';
   }
@@ -178,6 +211,15 @@ const buscarAgendamentos = async () => {
       if(agendamento.id_status == null) {
         days.value[weekDayIndex].agendamentos.push(agendamento);
       }
+    });
+
+    //Ordena a agenda com base no horário
+    days.value.forEach(day => {
+      day.agendamentos.sort((a, b) => {
+        const horaA = a.hora;
+        const horaB = b.hora;
+        return horaA.localeCompare(horaB);
+      });
     });
   } catch (error) {
     console.error('Erro ao carregar agendamentos:', error);
@@ -209,6 +251,8 @@ const viewDetails = (agendamento) => {
 
 const editar = (agendamento) => {
   selectedAgendamento.value = { ...agendamento };
+  selectedAgendamento.value.contatos.telefone = formatarTelefone(selectedAgendamento.value.contatos.telefone);
+  selectedAgendamento.value.clientes.cpf = formatarCPF(selectedAgendamento.value.clientes.cpf);
   showEditModal.value = true;
 };
 
@@ -218,10 +262,26 @@ const openModal = (agendamento, tipo) => {
   showStatusModal.value = true;
 };
 
-const closeModal = () => {
-  showStatusModal.value = false;
-  selectedAgendamento.value = null;
-  observacao.value = '';
+const formatarData = (data) => {
+  const options = { day: '2-digit', month: '2-digit', year: 'numeric' };
+  return new Date(data).toLocaleDateString('pt-BR', options);
+};
+
+const formatarHora = (hora) => {
+  const [hours, minutes] = hora.split(':');
+  return `${hours}:${minutes}`;
+};
+
+const formatarCPF = (cpf) => {
+  if (!cpf) return '';
+  return cpf.replace(/(\d{3})(\d)/, '$1.$2')
+            .replace(/(\d{3})(\d)/, '$1.$2')
+            .replace(/(\d{3})(\d{2})$/, '$1-$2');
+};
+
+const formatarTelefone = (telefone) => {
+  if (!telefone) return '';
+  return telefone.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
 };
 
 onMounted(() => {
