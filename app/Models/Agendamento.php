@@ -34,7 +34,6 @@ class Agendamento extends Model
             'atendimento' => 'exists:atendimentos,id',
             'data' => 'required|date',
             'hora' => 'required|date_format:H:i:s',
-            'data_leilao' => 'required|date',
             'categoria' => 'exists:categorias,id',
         ];
     }

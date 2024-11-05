@@ -72,7 +72,13 @@ class AgendamentoController extends Controller
             ]);
     
             // Valida os dados
-            $request->validate(Agendamento::rules(), Agendamento::feedback());
+            $rules = Agendamento::rules();
+            
+            if ($request->get('categoria') == '2') { 
+                $rules['data_leilao'] = 'required|date';
+            }
+
+            $request->validate($rules, Agendamento::feedback());
     
             $cliente = new Cliente();
             $cliente->nome = $request->get('nome');
