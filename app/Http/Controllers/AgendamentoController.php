@@ -16,7 +16,29 @@ class AgendamentoController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
+    {
+        $page = $request->input('page', 1);
+        $status = $request->input('status');
+    
+        $query = Agendamento::with([
+            'usuarios:id,name,role',
+            'clientes:id,nome,cpf,matricula',
+            'contatos:id,telefone',
+            'categorias:id,categoria',
+            'atendimentos:id,antendimento'
+        ]);
+    
+        if ($status) {
+            $query->where('id_status', $status); 
+        }
+    
+        $agendamentos = $query->paginate(6, ['*'], 'page', $page);
+    
+        return response()->json($agendamentos);
+    }
+
+    public function consultar()
     {
         
         $agendamentos = Agendamento::with([
@@ -29,6 +51,7 @@ class AgendamentoController extends Controller
 
         return response()->json($agendamentos);
     }
+    
 
     /**
      * Show the form for creating a new resource.

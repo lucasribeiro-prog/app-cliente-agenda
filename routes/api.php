@@ -13,3 +13,4 @@ Route::resource('cliente', \App\Http\Controllers\ClienteController::class);
 Route::resource('contato', \App\Http\Controllers\ContatoController::class);
 
 Route::put('agendar/{agendar}/reschedule', [\App\Http\Controllers\AgendamentoController::class, 'reschedule']);
+Route::get('consultar', [\App\Http\Controllers\AgendamentoController::class, 'consultar']);

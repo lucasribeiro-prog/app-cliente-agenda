@@ -36,12 +36,23 @@
                   </button>
 
                   <button v-if="currentTable.type === 'remarcar' || currentTable.type === 'aguardando'" class="detalhes bg-red-600" @click="remover(item.id)" title="Remover">
-                    <i class="fa-solid fa-trash"></i>
+                    <i class= "fa-solid fa-trash"></i>
                   </button>
                 </td>
               </tr>
             </tbody>
           </table>
+
+          <div class="flex justify-center mt-5 pagination-controls">
+            <button class="bg-white" @click="prevPage" :disabled="currentPage === 1">
+              <i class="text-zinc-500 fa-solid fa-chevron-left"></i>
+            </button>
+            <span class="font-bold mt-2 mr-2">Página {{ currentPage }} de {{ totalPages }}</span>
+            <button class="bg-white" @click="nextPage" :disabled="currentPage === totalPages">
+              <i class="text-zinc-500 fa-solid fa-chevron-right"></i>
+            </button>
+          </div>
+
         </div>
       </div>
     </div>
@@ -90,11 +101,10 @@
 
 
 <script>
-import { onMounted } from 'vue';
-import { ref } from 'vue';
+import { onMounted, ref, computed } from 'vue';
+import axios from 'axios';
 import Navbar from '../Components/Navbar.vue';
 import Sidebar from '../Components/Sidebar.vue';
-import axios from 'axios';
 import Modal from '../Components/Modal.vue';
 
 export default {
@@ -114,15 +124,20 @@ export default {
       data: [],
     });
     const headerColor = ref('rgb(20 184 166)');
-    const showDetailsModal  = ref(false);
-    const showRescheduleModal  = ref(false);
-    const showDeleteModal = ref(false);
-    const selectedAgendamento = ref(null);
+    const currentPage = ref(1);
+    const itemsPerPage = ref(6);
+    const totalItems = ref(0);
+    const totalPages = computed(() => Math.ceil(totalItems.value / itemsPerPage.value));
     const headerColors = {
       aguardando: 'rgb(245 158 11)',
       andamento: 'rgb(34 197 94)',
       remarcar: 'rgb(239 68 68)',
     };
+
+    const showDetailsModal = ref(false);
+    const showRescheduleModal = ref(false);
+    const showDeleteModal = ref(false);
+    const selectedAgendamento = ref(null);
 
     const statusMap = {
       andamento: 1,
@@ -130,24 +145,35 @@ export default {
       aguardando: 3,
     };
 
-    const loadTable = async (type) => {
+    const loadTable = async (type, page = 1) => {
       currentTable.value.type = type;
       currentTable.value.title = '';
       currentTable.value.data = [];
       headerColor.value = headerColors[type];
+      currentPage.value = page;
 
       try {
-        const response = await axios.get(`http://localhost:8000/api/agendar`);
+        const response = await axios.get(`http://localhost:8000/api/agendar?page=${page}`, {
+          params: {
+            page: currentPage.value,
+            limit: itemsPerPage.value,
+            status: statusMap[type],
+          },
+        });
+
         const userId = props.auth.user.id;
         const userRole = props.auth.user.role;
 
-        const filteredData = response.data.filter(item => {
+        const filteredData = response.data.data.filter(item => {
           if (userRole === 'admin') {
             return item.id_status === statusMap[type];
           } else {
             return item.id_status === statusMap[type] && item.id_usuario === userId;
           }
         });
+
+        totalItems.value = response.data.total;
+        currentPage.value = response.data.current_page;
 
         currentTable.value = {
           ...currentTable.value,
@@ -159,11 +185,29 @@ export default {
             consultor: item.usuarios.name,
             data_leilao: item.data_leilao,
             matricula: item.clientes.matricula,
-            id: item.id
+            id: item.id,
           })),
         };
       } catch (error) {
         console.error('Erro ao carregar dados da tabela:', error);
+      }
+    };
+
+    const goToPage = (page) => {
+      if (page >= 1 && page <= totalPages.value) {
+        loadTable(currentTable.value.type, page);
+      }
+    };
+
+    const nextPage = () => {
+      if (currentPage.value < totalPages.value) {
+        goToPage(currentPage.value + 1);
+      }
+    };
+
+    const prevPage = () => {
+      if (currentPage.value > 1) {
+        goToPage(currentPage.value - 1);
       }
     };
 
@@ -176,7 +220,7 @@ export default {
         } else if (modalType === 'reschedule') {
           showRescheduleModal.value = true;
         } else if (modalType === 'remover') {
-          showDeleteModal.value =true;
+          showDeleteModal.value = true;
         }
       }
     };
@@ -191,21 +235,18 @@ export default {
 
     const remover = (id) => {
       selectAgendamento(id, 'remover');
-    }
+    };
 
     const confirmarRemocao = async () => {
       try {
         await axios.delete(`http://localhost:8000/api/agendar/${selectedAgendamento.value.id}`);
-
         showDeleteModal.value = false;
         selectedAgendamento.value = null;
-
         await loadTable(currentTable.value.type);
-
       } catch (error) {
         console.error('Erro ao tentar remover o agendamento:', error);
       }
-    }
+    };
 
     const submitStatus = async (id) => {
       try {
@@ -213,7 +254,6 @@ export default {
           agendamento_id: id,
           status: 1,
         });
-
         await loadTable(currentTable.value.type);
       } catch (error) {
         console.error('Erro ao atualizar status:', error);
@@ -227,31 +267,28 @@ export default {
           data: selectedAgendamento.value.data,
           hora: selectedAgendamento.value.hora,
         };
-
-        const response = await axios.put(`http://localhost:8000/api/agendar/${selectedAgendamento.value.id}/reschedule`, formData);
-
+        await axios.put(`http://localhost:8000/api/agendar/${selectedAgendamento.value.id}/reschedule`, formData);
         selectedAgendamento.value = null;
         showRescheduleModal.value = false;
-
         await loadTable('remarcar');
-
       } catch (error) {
         console.error('Erro ao tentar atualizar os dados:', error);
-        message.value = 'Erro ao tentar atualizar os dados.';
       }
     };
 
     onMounted(() => {
-      loadTable('aguardando');
+      loadTable('aguardando', 1);
     });
 
     return {
       currentTable,
       loadTable,
-      viewDetails,
-      reschedule,
-      remover,
-      submitForm,
+      goToPage,
+      nextPage,
+      prevPage,
+      currentPage,
+      totalPages,
+      totalItems,
       headerColor,
       headerColors,
       selectedAgendamento,
@@ -260,6 +297,10 @@ export default {
       showDeleteModal,
       confirmarRemocao,
       submitStatus,
+      submitForm,
+      viewDetails,
+      reschedule,
+      remover,
     };
   },
 };
@@ -279,6 +320,10 @@ export default {
 
 .delete:hover {
   background-color: rgb(185 28 28);
+}
+
+button.bg-white:hover {
+  background-color: rgb(212 212 216);
 }
 
 thead th {

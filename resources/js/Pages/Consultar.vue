@@ -9,7 +9,7 @@
       <!-- Dropdown para cada dia da semana -->
       <div v-for="(day, index) in days" :key="index" class="day-section">
         <div @click="toggleDropdown(index)" class="dropdown-toggle">
-          {{ day.name }}
+          <span class="text-bold">{{ day.name }}</span>
         </div>
 
         <div v-if="day.isOpen" class="dropdown-content">
@@ -133,8 +133,6 @@ const days = ref([
   { name: 'Quarta-feira', isOpen: false, agendamentos: [] },
   { name: 'Quinta-feira', isOpen: false, agendamentos: [] },
   { name: 'Sexta-feira', isOpen: false, agendamentos: [] },
-  { name: 'Sábado', isOpen: false, agendamentos: [] },
-  { name: 'Domingo', isOpen: false, agendamentos: [] },
 ]);
 
 const showFeedbackModal  = ref(false);
@@ -196,7 +194,7 @@ const submitForm = async () => {
 
 const buscarAgendamentos = async () => {
   try {
-    const response = await axios.get('http://localhost:8000/api/agendar');
+    const response = await axios.get('http://localhost:8000/api/consultar');
     const agendamentos = response.data;
 
     // Reinicializa os agendamentos

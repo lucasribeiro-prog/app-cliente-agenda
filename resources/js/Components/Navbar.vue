@@ -66,7 +66,7 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: #333;
+  background: linear-gradient(to bottom, #000000, #3d3d3d);
   padding: 1em;
   border-radius: 0%;
 }
@@ -87,7 +87,7 @@ button {
 }
 
 button:hover {
-  background-color: #0056b3;
+  background-color: #0050a7;
   color: #fff;
 }
 </style>

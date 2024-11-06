@@ -65,7 +65,7 @@ export default defineComponent({
 <style scoped>
 .sidebar {
   width: 300px;
-  background-color: #0050a7;
+  background: linear-gradient(to bottom, #000033, #0050a7);
   padding: 20px;
   border-right: 1px solid #dee2e6;
   color: #fff;
