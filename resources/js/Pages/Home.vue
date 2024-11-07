@@ -36,7 +36,7 @@
                       <i class="fas fa-undo"></i>
                     </button>
 
-                    <button v-if="currentTable.type === 'aguardando'" class="detalhes bg-green-600" @click="submitStatus(item.id)" title="Pago">
+                    <button v-if="currentTable.type === 'aguardando'" class="detalhes bg-green-600" @click="pagamento(item.id)" title="Pago">
                       <i class="fas fa-check"></i>
                     </button>
 
@@ -67,9 +67,9 @@
     <Modal :show="showDetailsModal" @close="showDetailsModal = false">
       <template v-if="selectedAgendamento">
         <h1 class="text-center text-2xl font-bold mb-10">{{ selectedAgendamento.client }}</h1>
-        <p><strong>CPF:</strong> {{ selectedAgendamento.cpf }}</p>
-        <p><strong>Telefone:</strong> {{ selectedAgendamento.telefone }}</p>
-        <p><strong>Data do leilão:</strong> {{ selectedAgendamento.data_leilao }}</p>
+        <p><strong>CPF:</strong> {{ formatarCPF(selectedAgendamento.cpf) }}</p>
+        <p><strong>Telefone:</strong> {{ formatarTelefone(selectedAgendamento.telefone) }}</p>
+        <p><strong>Data do leilão:</strong> {{ formatarData(selectedAgendamento.data_leilao) }}</p>
         <p>
           <strong>Matrícula:</strong>
           <a :href="selectedAgendamento.matricula" class="ml-2" target="_blank">
@@ -92,13 +92,24 @@
       </template>
     </Modal>
 
-    <!-- Modal que exibe o formulario para reagendar o cliente -->
+    <!-- Modal de confirmação de remoção -->
     <Modal :show="showDeleteModal" @close="showDeleteModal = false" maxWidth="sm">
       <template v-if="selectedAgendamento">
         <h1 class="text-center text-red-600 text-2xl font-bold mb-4">Atenção!</h1>
-        <p class="text-center mb-10 text-lg">Deseja remover o agendamento?</p>
+        <p class="text-center mb-10 text-lg">Deseja remover o cliente?</p>
         <div class="flex justify-center">
           <button @click="confirmarRemocao" class="delete bg-red-500 text-white py-2 px-4 rounded" type="button">Sim</button>
+        </div>
+      </template>
+    </Modal>
+
+    <!-- Modal de confirmação de pagamento -->
+    <Modal :show="showPayModal" @close="showPayModal = false" maxWidth="sm">
+      <template v-if="selectedAgendamento">
+        <h1 class="text-center text-green-600 text-2xl font-bold mb-4">Atenção!</h1>
+        <p class="text-center mb-10 text-lg text-green-600">Confirmar Pagamento?</p>
+        <div class="flex justify-center">
+          <button @click="confirmarPagamento" class="pagamento bg-green-500 text-white py-2 px-4 rounded" type="button">Sim</button>
         </div>
       </template>
     </Modal>
@@ -144,6 +155,7 @@ export default {
     const showDetailsModal = ref(false);
     const showRescheduleModal = ref(false);
     const showDeleteModal = ref(false);
+    const showPayModal = ref(false);
     const selectedAgendamento = ref(null);
 
     const statusMap = {
@@ -232,6 +244,8 @@ export default {
           showRescheduleModal.value = true;
         } else if (modalType === 'remover') {
           showDeleteModal.value = true;
+        } else if (modalType === 'pagamento') {
+          showPayModal.value = true;
         }
       }
     };
@@ -248,6 +262,10 @@ export default {
       selectAgendamento(id, 'remover');
     };
 
+    const pagamento = (id) => {
+      selectAgendamento(id, 'pagamento');
+    };
+
     const confirmarRemocao = async () => {
       try {
         await axios.delete(`http://localhost:8000/api/agendar/${selectedAgendamento.value.id}`);
@@ -259,12 +277,14 @@ export default {
       }
     };
 
-    const submitStatus = async (id) => {
+    const confirmarPagamento = async () => {
       try {
         await axios.post('http://localhost:8000/api/agendar', {
-          agendamento_id: id,
+          agendamento_id: selectedAgendamento.value.id,
           status: 1,
         });
+        showPayModal.value = false;
+        selectedAgendamento.value = null;
         await loadTable(currentTable.value.type);
       } catch (error) {
         console.error('Erro ao atualizar status:', error);
@@ -287,6 +307,28 @@ export default {
       }
     };
 
+    const formatarData = (data) => {
+      const options = { day: '2-digit', month: '2-digit', year: 'numeric' };
+      return new Date(data).toLocaleDateString('pt-BR', options);
+    };
+
+    const formatarHora = (hora) => {
+      const [hours, minutes] = hora.split(':');
+      return `${hours}:${minutes}`;
+    };
+
+    const formatarCPF = (cpf) => {
+      if (!cpf) return '';
+      return cpf.replace(/(\d{3})(\d)/, '$1.$2')
+                .replace(/(\d{3})(\d)/, '$1.$2')
+                .replace(/(\d{3})(\d{2})$/, '$1-$2');
+    };
+
+    const formatarTelefone = (telefone) => {
+      if (!telefone) return '';
+      return telefone.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
+    };
+
     onMounted(() => {
       loadTable('aguardando', 1);
     });
@@ -306,13 +348,19 @@ export default {
       showDetailsModal,
       showRescheduleModal,
       showDeleteModal,
+      showPayModal,
       confirmarRemocao,
-      submitStatus,
+      confirmarPagamento,
       submitForm,
       viewDetails,
       reschedule,
       remover,
+      pagamento,
       isLoading,
+      formatarData,
+      formatarHora,
+      formatarCPF,
+      formatarTelefone,
     };
   },
 };
