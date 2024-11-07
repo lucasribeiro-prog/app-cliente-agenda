@@ -7,50 +7,56 @@
         :currentTableType="currentTable.type" 
         :headerColors="headerColors" 
         @load-table="loadTable" />
-      <div class="content">
+      <div class="content loading-container">
         <div v-if="currentTable">
-          <h2 class="text-center text-2xl font-bold">{{ currentTable.title }}</h2>
-          <table>
-            <thead>
-              <tr :style="{ backgroundColor: headerColor }">
-                <th>Cliente</th>
-                <th>Consultor</th>
-                <th>Opções</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="(item, index) in currentTable.data" :key="index">
-                <td>{{ item.client }}</td>
-                <td>{{ item.consultor }}</td>
-                <td>
-                  <button class="detalhes bg-neutral-600" @click="viewDetails(item.id)" title="Detalhes">
-                    <i class="fas fa-eye"></i>
-                  </button>
+          <div v-if="isLoading" class="loading-icon">
+            <i class="fas fa-spinner fa-spin text-3xl text-blue-500"></i>
+          </div>
 
-                  <button v-if="currentTable.type === 'remarcar'" class="detalhes bg-teal-600" @click="reschedule(item.id)" title="Remarcar">
-                    <i class="fas fa-undo"></i>
-                  </button>
+          <div v-else>
+            <h2 class="text-center text-2xl font-bold">{{ currentTable.title }}</h2>
+            <table>
+              <thead>
+                <tr :style="{ background: headerColor }">
+                  <th>Cliente</th>
+                  <th>Consultor</th>
+                  <th>Opções</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="(item, index) in currentTable.data" :key="index">
+                  <td>{{ item.client }}</td>
+                  <td>{{ item.consultor }}</td>
+                  <td>
+                    <button class="detalhes bg-neutral-600" @click="viewDetails(item.id)" title="Detalhes">
+                      <i class="fas fa-eye"></i>
+                    </button>
 
-                  <button v-if="currentTable.type === 'aguardando'" class="detalhes bg-green-600" @click="submitStatus(item.id)" title="Pago">
-                    <i class="fas fa-check"></i>
-                  </button>
+                    <button v-if="currentTable.type === 'remarcar'" class="detalhes bg-teal-600" @click="reschedule(item.id)" title="Remarcar">
+                      <i class="fas fa-undo"></i>
+                    </button>
 
-                  <button v-if="currentTable.type === 'remarcar' || currentTable.type === 'aguardando'" class="detalhes bg-red-600" @click="remover(item.id)" title="Remover">
-                    <i class= "fa-solid fa-trash"></i>
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+                    <button v-if="currentTable.type === 'aguardando'" class="detalhes bg-green-600" @click="submitStatus(item.id)" title="Pago">
+                      <i class="fas fa-check"></i>
+                    </button>
 
-          <div class="flex justify-center mt-5 pagination-controls">
-            <button class="bg-white" @click="prevPage" :disabled="currentPage === 1">
-              <i class="text-zinc-500 fa-solid fa-chevron-left"></i>
-            </button>
-            <span class="font-bold mt-2 mr-2">Página {{ currentPage }} de {{ totalPages }}</span>
-            <button class="bg-white" @click="nextPage" :disabled="currentPage === totalPages">
-              <i class="text-zinc-500 fa-solid fa-chevron-right"></i>
-            </button>
+                    <button v-if="currentTable.type === 'remarcar' || currentTable.type === 'aguardando'" class="detalhes bg-red-600" @click="remover(item.id)" title="Remover">
+                      <i class= "fa-solid fa-trash"></i>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+
+            <div class="flex justify-center mt-5 pagination-controls">
+              <button class="bg-white" @click="prevPage" :disabled="currentPage === 1">
+                <i class="text-zinc-500 fa-solid fa-chevron-left"></i>
+              </button>
+              <span class="font-bold mt-2 mr-2">Página {{ currentPage }} de {{ totalPages }}</span>
+              <button class="bg-white" @click="nextPage" :disabled="currentPage === totalPages">
+                <i class="text-zinc-500 fa-solid fa-chevron-right"></i>
+              </button>
+            </div>
           </div>
 
         </div>
@@ -123,15 +129,16 @@ export default {
       title: "Aguardando retorno",
       data: [],
     });
+    const isLoading = ref(false);
     const headerColor = ref('rgb(20 184 166)');
     const currentPage = ref(1);
     const itemsPerPage = ref(6);
     const totalItems = ref(0);
     const totalPages = computed(() => Math.ceil(totalItems.value / itemsPerPage.value));
     const headerColors = {
-      aguardando: 'rgb(245 158 11)',
-      andamento: 'rgb(34 197 94)',
-      remarcar: 'rgb(239 68 68)',
+      aguardando: 'linear-gradient(to bottom, rgb(215, 140, 10), rgb(245, 158, 11))',
+      andamento: 'linear-gradient(to bottom, rgb(28, 158, 76), rgb(34, 197, 94))',
+      remarcar: 'linear-gradient(to bottom, rgb(191, 54, 54), rgb(239, 68, 68))',
     };
 
     const showDetailsModal = ref(false);
@@ -146,6 +153,8 @@ export default {
     };
 
     const loadTable = async (type, page = 1) => {
+      isLoading.value = true;
+
       currentTable.value.type = type;
       currentTable.value.title = '';
       currentTable.value.data = [];
@@ -190,6 +199,8 @@ export default {
         };
       } catch (error) {
         console.error('Erro ao carregar dados da tabela:', error);
+      } finally {
+        isLoading.value = false;
       }
     };
 
@@ -301,6 +312,7 @@ export default {
       viewDetails,
       reschedule,
       remover,
+      isLoading,
     };
   },
 };
@@ -320,6 +332,18 @@ export default {
 
 .delete:hover {
   background-color: rgb(185 28 28);
+}
+
+.loading-container {
+  position: relative;
+  min-height: 100vh;
+}
+
+.loading-icon {
+  position: absolute;  
+  top: 40%;  
+  left: 50%; 
+  transform: translate(-50%, -50%);
 }
 
 button.bg-white:hover {

@@ -300,7 +300,7 @@ onMounted(() => {
 }
 
 .dropdown-toggle {
-  background-color: #0050a7;
+  background: linear-gradient(to left, #000033, #0050a7);
   color: white;
   padding: 0.5rem 1rem;
   cursor: pointer;
