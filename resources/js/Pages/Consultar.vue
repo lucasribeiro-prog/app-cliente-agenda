@@ -28,25 +28,35 @@
                 <td>{{ agendamento.clientes.nome }}</td>
                 <td>{{ agendamento.usuarios.name }}</td>
                 <td>
-                  <button class="detalhes bg-gray-600" @click="viewDetails(agendamento)" title="Detalhes">
-                    <i class="fas fa-eye"></i>
-                  </button>
+                  <div>
+                    <button class="detalhes bg-gray-600" @click="viewDetails(agendamento)" title="Detalhes">
+                      <i class="fas fa-eye"></i>
+                    </button>
 
-                  <button 
-                  class="editar bg-teal-500" 
-                  @click="editar(agendamento)" title="Editar"
-                  :disabled="user.id !== agendamento.usuarios.id && user.role !== 'admin'"
-                  :class="{ 'disabled-button': user.id !== agendamento.usuarios.id && user.role !== 'admin'}">
-                    <i class="fas fa-pencil-alt"></i>
-                  </button>
+                    <button 
+                    class="editar bg-teal-500" 
+                    @click="editar(agendamento)" title="Editar"
+                    :disabled="user.id !== agendamento.usuarios.id && user.role !== 'admin'"
+                    :class="{ 'disabled-button': user.id !== agendamento.usuarios.id && user.role !== 'admin'}">
+                      <i class="fas fa-pencil-alt"></i>
+                    </button>
 
-                  <button v-if="user.role === 'admin'" class="atendido bg-green-400" @click="openModal(agendamento, 'atendido')" title="Atendido">
-                    <i class="fas fa-check"></i>
-                  </button>
+                    <button v-if="user.role === 'admin'" class="atendido bg-green-400" @click="openModal(agendamento, 'atendido')" title="Atendido">
+                      <i class="fas fa-check"></i>
+                    </button>
 
-                  <button v-if="user.role === 'admin'" class="nao-compareceu bg-red-500" @click="openModal(agendamento, 'nao_compareceu')" title="Não Compareceu">
-                    <i class="fas fa-times"></i>
-                  </button>
+                    <button v-if="user.role === 'admin'" class="nao-compareceu bg-red-500" @click="openModal(agendamento, 'nao_compareceu')" title="Não Compareceu">
+                      <i class="fas fa-times"></i>
+                    </button>
+
+                    <button v-if="user.role === 'admin' && agendamento.id_link == null" class="adicionar_link bg-cyan-700" @click="adicionarLink(agendamento)" title="Adicionar Link">
+                      <i class="fa-solid fa-link-slash"></i>
+                    </button>
+
+                    <button v-if="agendamento.id_link !== null" class="copiar_link bg-cyan-700" title="Copiar Link" @click="copiarLink(agendamento.links.link_reuniao)">
+                      <i class="fa-solid fa-link"></i>
+                    </button>
+                  </div>
                 </td>
               </tr>
             </tbody>
@@ -83,6 +93,17 @@
           <input type="date" v-model="selectedAgendamento.data" required />
           <input type="time" v-model="selectedAgendamento.hora" required />
           <input type="text" v-model="selectedAgendamento.clientes.matricula" placeholder="Matrícula do Imóvel" required />
+          <button type="submit">Salvar</button>
+        </form>
+      </template>
+    </Modal>
+
+    <!-- Modal para adicionar o link da reunião -->
+    <Modal :show="showLinkModal" @close="showLinkModal = false" maxWidth="md">
+      <template v-if="selectedAgendamento">
+        <h1 class="text-center text-2xl font-bold mb-10">Link</h1>
+        <form @submit.prevent="submitLink">
+          <input type="text" v-model="link" placeholder="Adiconar link para a reunião" required />
           <button type="submit">Salvar</button>
         </form>
       </template>
@@ -136,6 +157,7 @@ const days = ref([
 ]);
 
 const showFeedbackModal  = ref(false);
+const showLinkModal = ref(false);
 const showDetailsModal  = ref(false);
 const showEditModal = ref(false);
 const showStatusModal = ref(false);
@@ -144,6 +166,7 @@ const selectedAgendamento = ref(null);
 const modalTipo = ref('');
 const observacao = ref('');
 const message = ref('');
+const link = ref('');
 
 const toggleDropdown = (index) => {
   days.value[index].isOpen = !days.value[index].isOpen;
@@ -164,10 +187,8 @@ const submitForm = async () => {
     const response = await axios.put(`http://localhost:8000/api/agendar/${selectedAgendamento.value.id}`, formData);
     message.value = response.data.message;
 
-    // Atualiza o agendamento localmente e recarrega os agendamentos
     await buscarAgendamentos();
 
-    // Limpar seleção e fechar modal
     selectedAgendamento.value = null;
     showEditModal.value = false;
     showFeedbackModal.value = true;
@@ -190,6 +211,35 @@ const submitForm = async () => {
     message.value = 'Erro ao tentar atualizar os dados.';
   }
 };
+
+const submitLink = async () => {
+  try {
+
+    const response = await axios.post(`http://localhost:8000/api/agendar`, {
+      agendamento_id: selectedAgendamento.value.id,
+      link: link.value,
+    });
+    message.value = response.data.message;
+
+    await buscarAgendamentos();
+
+    selectedAgendamento.value = null;
+    link.value = "";
+    showLinkModal.value = false;
+
+  } catch (error) {
+    if (error.response && error.response.status === 422) {
+      message.value = error.response.data.message || 'Erro inserir o link da reuniao.';
+    } else {
+      message.value = 'Ocorreu um erro inesperado. Tente novamente mais tarde.';
+    }
+
+    isError.value = true;
+    showFeedbackModal.value = true;
+    console.error('Erro ao tentar atualizar os dados:', error);
+    message.value = 'Erro ao tentar inserir um registro.';
+  }
+};
        
 
 const buscarAgendamentos = async () => {
@@ -197,7 +247,6 @@ const buscarAgendamentos = async () => {
     const response = await axios.get('http://localhost:8000/api/consultar');
     const agendamentos = response.data;
 
-    // Reinicializa os agendamentos
     days.value.forEach(day => {
       day.agendamentos = [];
     });
@@ -242,6 +291,18 @@ const submitStatus = async () => {
   }
 };
 
+const copiarLink = (idLink) => {
+  const url = idLink;
+
+  navigator.clipboard.writeText(url)
+    .then(() => {
+      alert("Link copiado para a área de transferência!");
+    })
+    .catch((err) => {
+      console.error("Erro ao copiar o link:", err);
+    });
+};
+
 const viewDetails = (agendamento) => {
   selectedAgendamento.value = agendamento;
   showDetailsModal.value = true;
@@ -252,6 +313,11 @@ const editar = (agendamento) => {
   selectedAgendamento.value.contatos.telefone = formatarTelefone(selectedAgendamento.value.contatos.telefone);
   selectedAgendamento.value.clientes.cpf = formatarCPF(selectedAgendamento.value.clientes.cpf);
   showEditModal.value = true;
+};
+
+const adicionarLink = (agendamento) => {
+  selectedAgendamento.value = { ...agendamento };
+  showLinkModal.value = true;
 };
 
 const openModal = (agendamento, tipo) => {

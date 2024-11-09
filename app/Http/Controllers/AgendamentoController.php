@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Agendamento;
 use App\Models\Cliente;
 use App\Models\Contato;
+use App\Models\Link;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
@@ -26,7 +27,7 @@ class AgendamentoController extends Controller
             'clientes:id,nome,cpf,matricula',
             'contatos:id,telefone',
             'categorias:id,categoria',
-            'atendimentos:id,antendimento'
+            'atendimentos:id,antendimento',
         ]);
     
         if ($status) {
@@ -46,7 +47,8 @@ class AgendamentoController extends Controller
             'clientes:id,nome,cpf,matricula',
             'contatos:id,telefone',
             'categorias:id,categoria',
-            'atendimentos:id,antendimento'
+            'atendimentos:id,antendimento',
+            'links:id,link_reuniao',
         ])->get();
 
         return response()->json($agendamentos);
@@ -78,6 +80,13 @@ class AgendamentoController extends Controller
 
             if ($request->has('observacao')) {
                 $agendamento->observacao = $request->get('observacao');
+            } else if($request->has('link')) {
+                $link = new Link();
+                $link->link_reuniao = $request->get('link');
+                print_r($link);
+                $link->save();
+
+                $agendamento->id_link = $link->id;
             }
             
             $agendamento->save();
