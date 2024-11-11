@@ -28,21 +28,33 @@
                   <td>{{ item.client }}</td>
                   <td>{{ item.consultor }}</td>
                   <td>
-                    <button class="detalhes bg-neutral-600" @click="viewDetails(item.id)" title="Detalhes">
-                      <i class="fas fa-eye"></i>
-                    </button>
+                    <div class="tooltip">
+                      <button class="detalhes bg-neutral-600" @click="viewDetails(item.id)">
+                        <i class="fas fa-eye"></i>
+                      </button>
+                      <span class="tooltip-text">Detalhes</span>
+                    </div>
 
-                    <button v-if="currentTable.type === 'remarcar'" class="detalhes bg-teal-600" @click="reschedule(item.id)" title="Remarcar">
-                      <i class="fas fa-undo"></i>
-                    </button>
+                    <div class="tooltip">
+                      <button v-if="currentTable.type === 'remarcar'" class="detalhes bg-teal-600" @click="reschedule(item.id)">
+                        <i class="fas fa-undo"></i>
+                      </button>
+                      <span class="tooltip-text">Remarcar</span>
+                    </div>  
+                    
+                    <div class="tooltip">
+                      <button v-if="currentTable.type === 'aguardando'" class="detalhes bg-green-600" @click="pagamento(item.id)">
+                        <i class="fas fa-check"></i>
+                      </button>
+                      <span class="tooltip-text">Pago</span>
+                    </div>
 
-                    <button v-if="currentTable.type === 'aguardando'" class="detalhes bg-green-600" @click="pagamento(item.id)" title="Pago">
-                      <i class="fas fa-check"></i>
-                    </button>
-
-                    <button v-if="currentTable.type === 'remarcar' || currentTable.type === 'aguardando'" class="detalhes bg-red-600" @click="remover(item.id)" title="Remover">
-                      <i class= "fa-solid fa-trash"></i>
-                    </button>
+                    <div class="tooltip">
+                      <button v-if="currentTable.type === 'remarcar' || currentTable.type === 'aguardando'" class="detalhes bg-red-600" @click="remover(item.id)">
+                        <i class= "fa-solid fa-trash"></i>
+                      </button>
+                      <span class="tooltip-text">Remover</span>
+                    </div>
                   </td>
                 </tr>
               </tbody>

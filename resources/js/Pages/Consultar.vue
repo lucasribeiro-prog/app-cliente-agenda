@@ -28,34 +28,51 @@
                 <td>{{ agendamento.clientes.nome }}</td>
                 <td>{{ agendamento.usuarios.name }}</td>
                 <td>
-                  <div>
-                    <button class="detalhes bg-gray-600" @click="viewDetails(agendamento)" title="Detalhes">
+                  <div class="tooltip">
+                    <button class="detalhes bg-gray-600" @click="viewDetails(agendamento)">
                       <i class="fas fa-eye"></i>
                     </button>
+                    <span class="tooltip-text">Detalhes</span>
+                  </div>
 
+                  <div class="tooltip">
                     <button 
                     class="editar bg-teal-500" 
-                    @click="editar(agendamento)" title="Editar"
+                    @click="editar(agendamento)"
                     :disabled="user.id !== agendamento.usuarios.id && user.role !== 'admin'"
                     :class="{ 'disabled-button': user.id !== agendamento.usuarios.id && user.role !== 'admin'}">
                       <i class="fas fa-pencil-alt"></i>
                     </button>
+                    <span class="tooltip-text">Editar</span>
+                  </div>
 
-                    <button v-if="user.role === 'admin'" class="atendido bg-green-400" @click="openModal(agendamento, 'atendido')" title="Atendido">
+                  <div class="tooltip">
+                    <button v-if="user.role === 'admin'" class="atendido bg-green-400" @click="openModal(agendamento, 'atendido')">
                       <i class="fas fa-check"></i>
                     </button>
+                    <span class="tooltip-text">Antendido</span>
+                  </div>
 
-                    <button v-if="user.role === 'admin'" class="nao-compareceu bg-red-500" @click="openModal(agendamento, 'nao_compareceu')" title="Não Compareceu">
+                  <div class="tooltip">
+                    <button v-if="user.role === 'admin'" class="nao-compareceu bg-red-500" @click="openModal(agendamento, 'nao_compareceu')">
                       <i class="fas fa-times"></i>
                     </button>
-
-                    <button v-if="user.role === 'admin' && agendamento.id_link == null" class="adicionar_link bg-cyan-700" @click="adicionarLink(agendamento)" title="Adicionar Link">
+                    <span class="tooltip-text">Não Compareceu</span>
+                  </div>
+                  
+                  <div class="tooltip">
+                    <button v-if="user.role === 'admin' && agendamento.id_link == null" class="adicionar_link bg-cyan-700" @click="adicionarLink(agendamento)">
                       <i class="fa-solid fa-link-slash"></i>
                     </button>
+                    <span class="tooltip-text">Adiconar Link</span>
+                  </div>
+                  
 
-                    <button v-if="agendamento.id_link !== null" class="copiar_link bg-cyan-700" title="Copiar Link" @click="copiarLink(agendamento.links.link_reuniao)">
+                  <div class="tooltip">
+                    <button v-if="agendamento.id_link !== null" class="copiar_link bg-cyan-700" @click="copiarLink(agendamento.links.link_reuniao)">
                       <i class="fa-solid fa-link"></i>
                     </button>
+                    <span class="tooltip-text">Copiar Link</span>
                   </div>
                 </td>
               </tr>
@@ -431,6 +448,10 @@ td {
 
 .nao-compareceu:hover {
  background-color: #c53030;
+}
+
+.adicionar_link:hover, .copiar_link:hover {
+  background-color: rgb(22 78 99);
 }
 
 button {
