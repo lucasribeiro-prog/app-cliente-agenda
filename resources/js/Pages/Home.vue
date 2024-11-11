@@ -36,7 +36,7 @@
                     </div>
 
                     <div class="tooltip">
-                      <button v-if="currentTable.type === 'remarcar'" class="detalhes bg-teal-600" @click="reschedule(item.id)">
+                      <button class="detalhes bg-teal-600" @click="reschedule(item.id)">
                         <i class="fas fa-undo"></i>
                       </button>
                       <span class="tooltip-text">Remarcar</span>
@@ -88,6 +88,7 @@
             <i class="fa-regular fa-file-pdf text-lg"></i>
           </a>
         </p>
+        <p><strong>Observação:</strong> {{ formatarCPF(selectedAgendamento.observacao) }} </p>
       </template>
     </Modal>
 
@@ -218,6 +219,7 @@ export default {
             consultor: item.usuarios.name,
             data_leilao: item.data_leilao,
             matricula: item.clientes.matricula,
+            observacao: item.observacao,
             id: item.id,
           })),
         };
@@ -408,6 +410,10 @@ export default {
 
 button.bg-white:hover {
   background-color: rgb(212 212 216);
+}
+
+button {
+  margin-left: 1px;
 }
 
 thead th {
