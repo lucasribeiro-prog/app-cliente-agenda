@@ -130,254 +130,191 @@
 </template>
 
 
-<script>
-import { onMounted, ref, computed } from 'vue';
+<script setup>
+import { ref, computed, onMounted } from 'vue';
 import axios from 'axios';
 import Navbar from '../Components/Navbar.vue';
 import Sidebar from '../Components/Sidebar.vue';
 import Modal from '../Components/Modal.vue';
 
-export default {
-  name: "Home",
-  components: {
-    Navbar,
-    Sidebar,
-    Modal,
-  },
-  props: {
-    auth: Object,
-  },
-  setup(props) {
-    const currentTable = ref({
-      type: 'aguardando',
-      title: "Aguardando retorno",
-      data: [],
-    });
-    const isLoading = ref(false);
-    const headerColor = ref('rgb(20 184 166)');
-    const currentPage = ref(1);
-    const itemsPerPage = ref(6);
-    const totalItems = ref(0);
-    const totalPages = computed(() => Math.ceil(totalItems.value / itemsPerPage.value));
-    const headerColors = {
-      aguardando: 'linear-gradient(to bottom, rgb(215, 140, 10), rgb(245, 158, 11))',
-      andamento: 'linear-gradient(to bottom, rgb(28, 158, 76), rgb(34, 197, 94))',
-      remarcar: 'linear-gradient(to bottom, rgb(191, 54, 54), rgb(239, 68, 68))',
-    };
+const props = defineProps({
+  auth: Object,
+});
 
-    const showDetailsModal = ref(false);
-    const showRescheduleModal = ref(false);
-    const showDeleteModal = ref(false);
-    const showPayModal = ref(false);
-    const selectedAgendamento = ref(null);
+// Definindo os estados reativos e computados
+const currentTable = ref({
+  type: 'aguardando',
+  title: "Aguardando retorno",
+  data: [],
+});
+const isLoading = ref(false);
+const headerColor = ref('rgb(20 184 166)');
+const currentPage = ref(1);
+const itemsPerPage = ref(6);
+const totalItems = ref(0);
+const totalPages = computed(() => Math.ceil(totalItems.value / itemsPerPage.value));
 
-    const statusMap = {
-      andamento: 1,
-      remarcar: 2,
-      aguardando: 3,
-    };
-
-    const loadTable = async (type, page = 1) => {
-      isLoading.value = true;
-
-      currentTable.value.type = type;
-      currentTable.value.title = '';
-      currentTable.value.data = [];
-      headerColor.value = headerColors[type];
-      currentPage.value = page;
-
-      try {
-        const response = await axios.get(`http://localhost:8000/api/agendar?page=${page}`, {
-          params: {
-            page: currentPage.value,
-            limit: itemsPerPage.value,
-            status: statusMap[type],
-          },
-        });
-
-        const userId = props.auth.user.id;
-        const userRole = props.auth.user.role;
-
-        const filteredData = response.data.data.filter(item => {
-          if (userRole === 'admin') {
-            return item.id_status === statusMap[type];
-          } else {
-            return item.id_status === statusMap[type] && item.id_usuario === userId;
-          }
-        });
-
-        totalItems.value = response.data.total;
-        currentPage.value = response.data.current_page;
-
-        currentTable.value = {
-          ...currentTable.value,
-          title: type === 'aguardando' ? "Aguardando Retorno" : type === 'andamento' ? "Em Andamento" : "Remarcar",
-          data: filteredData.map(item => ({
-            client: item.clientes.nome,
-            cpf: item.clientes.cpf,
-            telefone: item.contatos.telefone,
-            consultor: item.usuarios.name,
-            data_leilao: item.data_leilao,
-            matricula: item.clientes.matricula,
-            observacao: item.observacao,
-            id: item.id,
-          })),
-        };
-      } catch (error) {
-        console.error('Erro ao carregar dados da tabela:', error);
-      } finally {
-        isLoading.value = false;
-      }
-    };
-
-    const goToPage = (page) => {
-      if (page >= 1 && page <= totalPages.value) {
-        loadTable(currentTable.value.type, page);
-      }
-    };
-
-    const nextPage = () => {
-      if (currentPage.value < totalPages.value) {
-        goToPage(currentPage.value + 1);
-      }
-    };
-
-    const prevPage = () => {
-      if (currentPage.value > 1) {
-        goToPage(currentPage.value - 1);
-      }
-    };
-
-    const selectAgendamento = (id, modalType) => {
-      const item = currentTable.value.data.find(dataItem => dataItem.id === id);
-      if (item) {
-        selectedAgendamento.value = item;
-        if (modalType === 'details') {
-          showDetailsModal.value = true;
-        } else if (modalType === 'reschedule') {
-          showRescheduleModal.value = true;
-        } else if (modalType === 'remover') {
-          showDeleteModal.value = true;
-        } else if (modalType === 'pagamento') {
-          showPayModal.value = true;
-        }
-      }
-    };
-
-    const viewDetails = (id) => {
-      selectAgendamento(id, 'details');
-    };
-
-    const reschedule = (id) => {
-      selectAgendamento(id, 'reschedule');
-    };
-
-    const remover = (id) => {
-      selectAgendamento(id, 'remover');
-    };
-
-    const pagamento = (id) => {
-      selectAgendamento(id, 'pagamento');
-    };
-
-    const confirmarRemocao = async () => {
-      try {
-        await axios.delete(`http://localhost:8000/api/agendar/${selectedAgendamento.value.id}`);
-        showDeleteModal.value = false;
-        selectedAgendamento.value = null;
-        await loadTable(currentTable.value.type);
-      } catch (error) {
-        console.error('Erro ao tentar remover o agendamento:', error);
-      }
-    };
-
-    const confirmarPagamento = async () => {
-      try {
-        await axios.post('http://localhost:8000/api/agendar', {
-          agendamento_id: selectedAgendamento.value.id,
-          status: 1,
-        });
-        showPayModal.value = false;
-        selectedAgendamento.value = null;
-        await loadTable(currentTable.value.type);
-      } catch (error) {
-        console.error('Erro ao atualizar status:', error);
-      }
-    };
-
-    const submitForm = async () => {
-      try {
-        const formData = {
-          id: selectedAgendamento.value.id,
-          data: selectedAgendamento.value.data,
-          hora: selectedAgendamento.value.hora,
-        };
-        await axios.put(`http://localhost:8000/api/agendar/${selectedAgendamento.value.id}/reschedule`, formData);
-        selectedAgendamento.value = null;
-        showRescheduleModal.value = false;
-        await loadTable('remarcar');
-      } catch (error) {
-        console.error('Erro ao tentar atualizar os dados:', error);
-      }
-    };
-
-    const formatarData = (data) => {
-      const options = { day: '2-digit', month: '2-digit', year: 'numeric' };
-      return new Date(data).toLocaleDateString('pt-BR', options);
-    };
-
-    const formatarHora = (hora) => {
-      const [hours, minutes] = hora.split(':');
-      return `${hours}:${minutes}`;
-    };
-
-    const formatarCPF = (cpf) => {
-      if (!cpf) return '';
-      return cpf.replace(/(\d{3})(\d)/, '$1.$2')
-                .replace(/(\d{3})(\d)/, '$1.$2')
-                .replace(/(\d{3})(\d{2})$/, '$1-$2');
-    };
-
-    const formatarTelefone = (telefone) => {
-      if (!telefone) return '';
-      return telefone.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
-    };
-
-    onMounted(() => {
-      loadTable('aguardando', 1);
-    });
-
-    return {
-      currentTable,
-      loadTable,
-      goToPage,
-      nextPage,
-      prevPage,
-      currentPage,
-      totalPages,
-      totalItems,
-      headerColor,
-      headerColors,
-      selectedAgendamento,
-      showDetailsModal,
-      showRescheduleModal,
-      showDeleteModal,
-      showPayModal,
-      confirmarRemocao,
-      confirmarPagamento,
-      submitForm,
-      viewDetails,
-      reschedule,
-      remover,
-      pagamento,
-      isLoading,
-      formatarData,
-      formatarHora,
-      formatarCPF,
-      formatarTelefone,
-    };
-  },
+const headerColors = {
+  aguardando: 'linear-gradient(to bottom, rgb(215, 140, 10), rgb(245, 158, 11))',
+  andamento: 'linear-gradient(to bottom, rgb(28, 158, 76), rgb(34, 197, 94))',
+  remarcar: 'linear-gradient(to bottom, rgb(191, 54, 54), rgb(239, 68, 68))',
 };
+
+const showDetailsModal = ref(false);
+const showRescheduleModal = ref(false);
+const showDeleteModal = ref(false);
+const showPayModal = ref(false);
+const selectedAgendamento = ref(null);
+
+const statusMap = {
+  andamento: 1,
+  remarcar: 2,
+  aguardando: 3,
+};
+
+// Funções para carregar e manipular a tabela
+const loadTable = async (type, page = 1) => {
+  isLoading.value = true;
+  currentTable.value.type = type;
+  currentTable.value.title = '';
+  currentTable.value.data = [];
+  headerColor.value = headerColors[type];
+  currentPage.value = page;
+
+  try {
+    const response = await axios.get(`http://localhost:8000/api/agendar?page=${page}`, {
+      params: {
+        page: currentPage.value,
+        limit: itemsPerPage.value,
+        status: statusMap[type],
+      },
+    });
+
+    const userId = props.auth.user.id;
+    const userRole = props.auth.user.role;
+
+    const filteredData = response.data.data.filter(item => {
+      if (userRole === 'admin') {
+        return item.id_status === statusMap[type];
+      } else {
+        return item.id_status === statusMap[type] && item.id_usuario === userId;
+      }
+    });
+
+    totalItems.value = response.data.total;
+    currentPage.value = response.data.current_page;
+
+    currentTable.value = {
+      ...currentTable.value,
+      title: type === 'aguardando' ? "Aguardando Retorno" : type === 'andamento' ? "Em Andamento" : "Remarcar",
+      data: filteredData.map(item => ({
+        client: item.clientes.nome,
+        cpf: item.clientes.cpf,
+        telefone: item.contatos.telefone,
+        consultor: item.usuarios.name,
+        data_leilao: item.data_leilao,
+        matricula: item.clientes.matricula,
+        observacao: item.observacao,
+        id: item.id,
+      })),
+    };
+  } catch (error) {
+    console.error('Erro ao carregar dados da tabela:', error);
+  } finally {
+    isLoading.value = false;
+  }
+};
+
+// Controle de paginação
+const goToPage = (page) => {
+  if (page >= 1 && page <= totalPages.value) {
+    loadTable(currentTable.value.type, page);
+  }
+};
+
+const nextPage = () => {
+  if (currentPage.value < totalPages.value) {
+    goToPage(currentPage.value + 1);
+  }
+};
+
+const prevPage = () => {
+  if (currentPage.value > 1) {
+    goToPage(currentPage.value - 1);
+  }
+};
+
+// Funções para selecionar e manipular agendamentos
+const selectAgendamento = (id, modalType) => {
+  const item = currentTable.value.data.find(dataItem => dataItem.id === id);
+  if (item) {
+    selectedAgendamento.value = item;
+    if (modalType === 'details') {
+      showDetailsModal.value = true;
+    } else if (modalType === 'reschedule') {
+      showRescheduleModal.value = true;
+    } else if (modalType === 'remover') {
+      showDeleteModal.value = true;
+    } else if (modalType === 'pagamento') {
+      showPayModal.value = true;
+    }
+  }
+};
+
+// Métodos para visualização, remoção e manipulação de agendamentos
+const viewDetails = (id) => selectAgendamento(id, 'details');
+const reschedule = (id) => selectAgendamento(id, 'reschedule');
+const remover = (id) => selectAgendamento(id, 'remover');
+const pagamento = (id) => selectAgendamento(id, 'pagamento');
+
+const confirmarRemocao = async () => {
+  try {
+    await axios.delete(`http://localhost:8000/api/agendar/${selectedAgendamento.value.id}`);
+    showDeleteModal.value = false;
+    selectedAgendamento.value = null;
+    await loadTable(currentTable.value.type);
+  } catch (error) {
+    console.error('Erro ao tentar remover o agendamento:', error);
+  }
+};
+
+const confirmarPagamento = async () => {
+  try {
+    await axios.post('http://localhost:8000/api/agendar', {
+      agendamento_id: selectedAgendamento.value.id,
+      status: 1,
+    });
+    showPayModal.value = false;
+    selectedAgendamento.value = null;
+    await loadTable(currentTable.value.type);
+  } catch (error) {
+    console.error('Erro ao atualizar status:', error);
+  }
+};
+
+const submitForm = async () => {
+  try {
+    const formData = {
+      id: selectedAgendamento.value.id,
+      data: selectedAgendamento.value.data,
+      hora: selectedAgendamento.value.hora,
+    };
+    await axios.put(`http://localhost:8000/api/agendar/${selectedAgendamento.value.id}/reschedule`, formData);
+    selectedAgendamento.value = null;
+    showRescheduleModal.value = false;
+    await loadTable('remarcar');
+  } catch (error) {
+    console.error('Erro ao tentar atualizar os dados:', error);
+  }
+};
+
+// Funções de formatação
+const formatarData = (data) => new Date(data).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+const formatarHora = (hora) => hora.slice(0, 5);
+const formatarCPF = (cpf) => cpf ? cpf.replace(/(\d{3})(\d)/g, '$1.$2').replace(/(\d{3})(\d{2})$/, '$1-$2') : '';
+const formatarTelefone = (telefone) => telefone ? telefone.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3') : '';
+
+onMounted(() => loadTable('aguardando', 1));
 </script>
 
 <style scoped>
