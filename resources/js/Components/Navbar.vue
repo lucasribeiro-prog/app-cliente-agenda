@@ -35,9 +35,16 @@
                   </template>
 
                   <template #content>
+                    <DropdownLink :href="route('profile.edit')"  as="button">
+                      <i class="fa-solid fa-user mr-2"></i><span>Perfil</span>
+                    </DropdownLink>
+
+                    <DropdownLink v-if="$page.props.auth.user.role === 'admin'" :href="route('admin.users')"  as="button">
+                      <i class="fa-solid fa-users mr-2"></i><span>Usuarios</span>
+                    </DropdownLink>
                     
                     <DropdownLink :href="route('logout')" method="post" as="button">
-                        Sair
+                      <i class="fas fa-sign-out-alt mr-2"></i><span>Sair</span>
                     </DropdownLink>
                   </template>
               </Dropdown>

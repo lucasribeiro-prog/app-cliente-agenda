@@ -3,7 +3,7 @@
         <Navbar />
 
         <div class="container">
-            <h1 style="margin-bottom: 20px; margin-top: 10px;"><b>Agendar Atendimento</b></h1>
+            <h1 class="text-xl font-semibold leading-tight text-gray-800"><b>Agendar Atendimento</b></h1>
             <form @submit.prevent="submitForm">
                 <input type="text" v-model="nome" placeholder="Nome" required />
 

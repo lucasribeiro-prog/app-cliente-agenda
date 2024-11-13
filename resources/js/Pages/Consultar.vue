@@ -4,7 +4,7 @@
     <Navbar />
 
     <div class="container">
-      <h1><b>Consultar Agendamentos</b></h1>
+      <h1 class="text-xl font-semibold leading-tight text-gray-800">Consultar Agendamentos</h1>
 
       <!-- Dropdown para cada dia da semana -->
       <div v-for="(day, index) in days" :key="index" class="day-section">
