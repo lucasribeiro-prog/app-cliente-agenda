@@ -43,9 +43,9 @@
                       <i class="fa-solid fa-users mr-2"></i><span>Usuarios</span>
                     </DropdownLink>
                     
-                    <DropdownLink :href="route('logout')" method="post" as="button">
+                    <button @click="handleLogout" as="button">
                       <i class="fas fa-sign-out-alt mr-2"></i><span>Sair</span>
-                    </DropdownLink>
+                    </button>
                   </template>
               </Dropdown>
             </div>
@@ -55,6 +55,7 @@
 
 <script>
 import { Link } from '@inertiajs/vue3';
+import { Inertia } from '@inertiajs/inertia';
 import Dropdown from '@/Components/Dropdown.vue';
 import DropdownLink from '@/Components/DropdownLink.vue';
 
@@ -65,6 +66,15 @@ export default {
     Dropdown,
     DropdownLink
   },
+
+  methods: {
+    handleLogout() {
+      localStorage.clear();
+      sessionStorage.clear();
+
+      Inertia.post(this.route('logout'));
+    }
+  }
 };
 </script>
 
