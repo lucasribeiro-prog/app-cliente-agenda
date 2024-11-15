@@ -52,9 +52,28 @@ class UserController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
-    {
-        //
+    public function update(Request $request, User $user)
+    {   
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255|unique:users,email,' . $user->id,
+            'role' => 'required|integer|in:1,2',
+        ]);
+
+        $usuario = $user;
+        $usuario->name = $request->input('name');
+        $usuario->email = $request->input('email');
+        if ($request->role == 1) {
+            $usuario->role = 'CONSULTOR';
+        } elseif ($request->role == 2) {
+            $usuario->role = 'ADMIN';
+        }
+        $usuario->save();
+
+        return response()->json([
+            'sucesso' => 'Dados atualizados com sucesso.',
+            'user' => $usuario,
+        ], 200);
     }
 
     /**
