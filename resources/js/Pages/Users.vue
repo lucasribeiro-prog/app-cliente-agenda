@@ -14,7 +14,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="user in users.data" :key="user.id">
+          <tr v-for="user in users" :key="user.id">
             <td>{{ user.id }}</td>
             <td>{{ user.name }}</td>
             <td>{{ user.email }}</td>
@@ -30,25 +30,59 @@
   </div>
 </template>
 
-<script>
-import Navbar from '../Components/Navbar.vue';
+<script setup>
+import { ref, onMounted } from 'vue';
+import axios from 'axios';
+import Navbar from '@/Components/Navbar.vue';
 
-export default {
-  components: {
-    Navbar,
-  },
-  props: {
-    users: Object,
-  },
-  methods: {
-    editUser(user) {
-      // Lógica de edição do usuário
-    },
-    deleteUser(userId) {
-      // Lógica para excluir o usuário
-    },
-  },
+const users = ref([]);
+
+const fetchUsers = async () => {
+  try {
+    const token = localStorage.getItem('auth_token');
+    
+    if (!token) {
+      console.error('Token não encontrado');
+      return;
+    }
+
+    const response = await axios.get('/api/users', {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      }
+    });
+
+    users.value = response.data;
+  } catch (error) {
+    console.error('Erro ao buscar usuários:', error);
+  }
 };
+
+const deleteUser = async (userId) => {
+  try {
+    const token = localStorage.getItem('auth_token');
+    if (!token) {
+      console.error('Token não encontrado');
+      return;
+    }
+
+    await axios.delete(`/api/users/${userId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      }
+    });
+
+    fetchUsers();
+  } catch (error) {
+    console.error('Erro ao deletar usuário:', error);
+  }
+};
+
+const editUser = (user) => {
+  console.log('Editar usuário:', user);
+};
+
+onMounted(fetchUsers);
 </script>
 
 <style scoped>

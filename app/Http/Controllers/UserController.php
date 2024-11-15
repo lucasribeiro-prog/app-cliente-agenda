@@ -13,8 +13,8 @@ class UserController extends Controller
      */
     public function index()
     {
-        $users = User::paginate(10);
-        return Inertia::render('Users', ['users' => $users]);
+        $users = User::get();
+        return response()->json($users);
     }
 
     /**

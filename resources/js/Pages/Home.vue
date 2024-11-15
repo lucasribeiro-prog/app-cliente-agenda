@@ -314,7 +314,16 @@ const formatarHora = (hora) => hora.slice(0, 5);
 const formatarCPF = (cpf) => cpf ? cpf.replace(/(\d{3})(\d)/g, '$1.$2').replace(/(\d{3})(\d{2})$/, '$1-$2') : '';
 const formatarTelefone = (telefone) => telefone ? telefone.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3') : '';
 
-onMounted(() => loadTable('aguardando', 1));
+onMounted(() => {
+  if (props.auth && props.auth.token) {
+    const token = props.auth.token;
+    localStorage.setItem('auth_token', token);
+  } else {
+    console.log("Token não encontrado");
+  }
+
+  loadTable('aguardando', 1);  // Carrega a tabela após o token ser verificado
+});
 </script>
 
 <style scoped>

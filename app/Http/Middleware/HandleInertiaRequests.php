@@ -29,10 +29,23 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
+        $user = $request->user();
+        $token = null;
+    
+        // Verifica se o usuário está autenticado e tenta gerar o token
+        if ($user) {
+            try {
+                $token = $user->createToken('Token de Acesso')->plainTextToken;
+            } catch (\Exception $e) {
+                // Handle exception if necessary
+            }
+        }
+
         return [
             ...parent::share($request),
             'auth' => [
-                'user' => $request->user(),
+                'user' => $user,
+                'token' => $token,
             ],
         ];
     }

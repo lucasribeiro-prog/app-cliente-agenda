@@ -21,7 +21,11 @@ Route::get('/agendar', function () {
 
 Route::get('/consultar', function () {
     return Inertia::render('Consultar'); 
-})->middleware(['auth']); 
+})->middleware(['auth']);
+
+Route::get('/users', function () {
+    return Inertia::render('Users'); 
+})->middleware(['auth'])->name('admin.users'); 
 
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
@@ -31,10 +35,6 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-});
-
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('users', [UserController::class, 'index'])->name('admin.users');
 });
 
 require __DIR__.'/auth.php';
