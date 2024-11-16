@@ -9,7 +9,7 @@
             <th>ID</th>
             <th>Nome</th>
             <th>Email</th>
-            <th>Papel</th>
+            <th>Permissão</th>
             <th>Ações</th>
           </tr>
         </thead>
@@ -30,7 +30,7 @@
   </div>
 
   <!-- Modal edição de usuarios -->
-  <Modal :show="showEditModal" @close="showEditModal = false">
+  <Modal :show="showEditModal" @close="showEditModal = false" maxWidth="md">
     <template v-if="selectedUser">
       <h1 class="text-center text-2xl font-bold mb-10">Editar Usuario</h1>
       <form @submit.prevent="editUser">
@@ -39,7 +39,7 @@
         <input type="email" v-model="selectedUser.email" placeholder="Email" required />
         <select v-model="selectedUser.role" required>
           <option value="" disabled selected>Selecione uma permissão</option>
-          <option value="1">CONSULTOR</option>
+          <option value="1">PADRÃO</option>
           <option value="2">ADMIN</option>
         </select>
         <button type="submit">Salvar</button>
@@ -55,7 +55,12 @@ import Navbar from '@/Components/Navbar.vue';
 import Modal from '../Components/Modal.vue';
 
 const users = ref([]);
-const selectedUser = ref(null);
+const selectedUser = ref({
+  id: null,
+  name: '',
+  email: '',
+  role: '',
+});
 const showEditModal = ref(false);
 
 const editar = (user) => {
@@ -112,14 +117,12 @@ const editUser = async () => {
       email: selectedUser.value.email,
       role: selectedUser.value.role,
     };
-    console.log(formData);
 
     const token = localStorage.getItem('auth_token');
     if (!token) {
       console.error('Token não encontrado');
       return;
     }
-    console.log(selectedUser.value)
     await axios.put(`/api/users/${selectedUser.value.id}`, formData, {
       headers: {
         Authorization: `Bearer ${token}`,

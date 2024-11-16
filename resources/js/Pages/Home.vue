@@ -194,7 +194,7 @@ const loadTable = async (type, page = 1) => {
     const userRole = props.auth.user.role;
 
     const filteredData = response.data.data.filter(item => {
-      if (userRole === 'admin') {
+      if (userRole === 'ADMIN') {
         return item.id_status === statusMap[type];
       } else {
         return item.id_status === statusMap[type] && item.id_usuario === userId;

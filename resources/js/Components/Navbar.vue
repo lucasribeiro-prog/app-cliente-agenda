@@ -39,7 +39,7 @@
                       <i class="fa-solid fa-user mr-2"></i><span>Perfil</span>
                     </DropdownLink>
 
-                    <DropdownLink v-if="$page.props.auth.user.role === 'admin'" :href="route('admin.users')"  as="button">
+                    <DropdownLink v-if="$page.props.auth.user.role === 'ADMIN'" :href="route('admin.users')"  as="button">
                       <i class="fa-solid fa-users mr-2"></i><span>Usuarios</span>
                     </DropdownLink>
                     

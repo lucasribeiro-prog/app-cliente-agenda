@@ -64,7 +64,7 @@ class UserController extends Controller
         $usuario->name = $request->input('name');
         $usuario->email = $request->input('email');
         if ($request->role == 1) {
-            $usuario->role = 'CONSULTOR';
+            $usuario->role = 'PADRÃO';
         } elseif ($request->role == 2) {
             $usuario->role = 'ADMIN';
         }

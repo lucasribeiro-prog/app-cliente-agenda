@@ -39,29 +39,29 @@
                     <button 
                     class="editar bg-teal-500" 
                     @click="editar(agendamento)"
-                    :disabled="user.id !== agendamento.usuarios.id && user.role !== 'admin'"
-                    :class="{ 'disabled-button': user.id !== agendamento.usuarios.id && user.role !== 'admin'}">
+                    :disabled="user.id !== agendamento.usuarios.id && user.role !== 'ADMIN'"
+                    :class="{ 'disabled-button': user.id !== agendamento.usuarios.id && user.role !== 'ADMIN'}">
                       <i class="fas fa-pencil-alt"></i>
                     </button>
                     <span class="tooltip-text">Editar</span>
                   </div>
 
                   <div class="tooltip">
-                    <button v-if="user.role === 'admin'" class="atendido bg-green-400" @click="openModal(agendamento, 'atendido')">
+                    <button v-if="user.role === 'ADMIN'" class="atendido bg-green-400" @click="openModal(agendamento, 'atendido')">
                       <i class="fas fa-check"></i>
                     </button>
                     <span class="tooltip-text">Antendido</span>
                   </div>
 
                   <div class="tooltip">
-                    <button v-if="user.role === 'admin'" class="nao-compareceu bg-red-500" @click="openModal(agendamento, 'nao_compareceu')">
+                    <button v-if="user.role === 'ADMIN'" class="nao-compareceu bg-red-500" @click="openModal(agendamento, 'nao_compareceu')">
                       <i class="fas fa-times"></i>
                     </button>
                     <span class="tooltip-text">Não Compareceu</span>
                   </div>
                   
                   <div class="tooltip">
-                    <button v-if="user.role === 'admin' && agendamento.id_link == null" class="adicionar_link bg-cyan-700" @click="adicionarLink(agendamento)">
+                    <button v-if="user.role === 'ADMIN' && agendamento.id_link == null" class="adicionar_link bg-cyan-700" @click="adicionarLink(agendamento)">
                       <i class="fa-solid fa-link-slash"></i>
                     </button>
                     <span class="tooltip-text">Adiconar Link</span>
