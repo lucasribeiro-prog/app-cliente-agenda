@@ -43,8 +43,8 @@
                       <i class="fa-solid fa-users mr-2"></i><span>Usuarios</span>
                     </DropdownLink>
                     
-                    <button @click="handleLogout" as="button">
-                      <i class="fas fa-sign-out-alt mr-2"></i><span>Sair</span>
+                    <button class="button-logout" @click="handleLogout" as="button">
+                      <i class="fas fa-sign-out-alt mr-2"></i><span class="span-logout">Sair</span>
                     </button>
                   </template>
               </Dropdown>
@@ -101,6 +101,15 @@ li a {
 button {
   background-color: #fff;
   color: #000000;
+}
+
+.button-logout {
+  width: 100%;
+  display: flex;
+}
+
+.span-logout {
+  margin-top: -3px;
 }
 
 button:hover {
