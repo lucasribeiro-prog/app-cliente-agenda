@@ -46,8 +46,9 @@
         <input type="email" v-model="selectedUser.email" placeholder="Email" required />
         <select v-model="selectedUser.role" required>
           <option value="" disabled selected>Selecione uma permissão</option>
-          <option value="1">PADRÃO</option>
-          <option value="2">ADMIN</option>
+          <option v-for="role in roles" :key="role.value" :value="role.value">
+            {{ role.label }}
+          </option>
         </select>
         <button type="submit">Salvar</button>
       </form>
@@ -72,6 +73,22 @@
       </form>
     </template>
   </Modal>
+
+    <!-- Modal para exibir feedback -->
+    <Modal :show="showFeedbackModal" @close="showFeedbackModal = false" maxWidth="md">
+      <!-- Ícone de Sucesso -->
+      <div class="mb-4">
+          <svg v-if="isError" class="w-12 h-12 text-red-500 mx-auto" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zM13 7h-2v6h2V7zm0 8h-2v2h2v-2z"/>
+          </svg>
+          <svg v-else class="w-12 h-12 text-green-500 mx-auto" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+              <path d="M12 0C5.372 0 0 5.373 0 12s5.372 12 12 12 12-5.373 12-12S18.628 0 12 0zm-1.533 17.025l-4.51-4.509 1.412-1.412 3.098 3.1 7.379-7.379 1.412 1.412-8.791 8.788z"/>
+          </svg>
+      </div>
+      <h1 :class="isError ? 'text-red-700' : 'text-green-700'" class="text-center text-2xl font-bold mb-2">
+          {{ isError ? message : message }}
+      </h1>
+    </Modal>
 </template>
 
 <script setup>
@@ -89,11 +106,19 @@ const selectedUser = ref({
 });
 const showEditModal = ref(false);
 const showAddUserModal = ref(false);
+const showFeedbackModal  = ref(false);
+const isError = ref(false);
+const message = ref('');
 const nome = ref('');
 const email = ref('');
 const senha = ref('');
 const confirmSenha = ref('');
 const role = ref('');
+
+const roles = [
+  { value: "1", label: "PADRÃO" },
+  { value: "2", label: "ADMIN" }
+]
 
 const editar = (user) => {
   selectedUser.value = { ...user };
@@ -120,7 +145,6 @@ const fetchUsers = async () => {
     });
 
     users.value = response.data;
-    console.log(users);
   } catch (error) {
     console.error('Erro ao buscar usuários:', error);
   }
@@ -166,9 +190,17 @@ const editUser = async () => {
       },
     });
 
+    isError.value = false;
+    message.value = 'Dados atualizados com sucesso!';
+
     fetchUsers();
     showEditModal.value = false;
+    showFeedbackModal.value = true;
   } catch (error) {
+
+    isError.value = true;
+    showFeedbackModal.value = true;
+    message.value = 'Erro ao atualizar os dados.';
     console.error('Erro ao atualizar os dados:', error);
   }
 };
@@ -194,9 +226,17 @@ const addUser = async () => {
       },
     });
 
+    isError.value = false;
+    message.value = 'Usuario adicionado com sucesso!';
+
     fetchUsers();
     showAddUserModal.value = false;
+    showFeedbackModal.value = true;
+
   } catch (error) {
+    isError.value = true;
+    showFeedbackModal.value = true;
+    message.value = 'Erro ao cadastrar o usuario.';
     console.error('Erro ao cadastrar o usuario:', error);
   }
 };
