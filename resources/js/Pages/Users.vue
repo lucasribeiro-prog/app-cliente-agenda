@@ -2,7 +2,14 @@
   <div class="users">
     <Navbar />
     <div class="container">
-      <h1 class="text-xl font-semibold leading-tight text-gray-800">Administração de Usuários</h1>
+      <div class="flex items-center justify-between">
+        <h1 class="text-xl font-semibold leading-tight text-gray-800">
+          Administração de Usuários
+        </h1>
+        <button @click="adicionarUsuario" class="bg-blue-500 text-white px-4 py-2 mb-2 rounded hover:bg-blue-700">
+          <i class="fa-solid fa-user-plus"></i>
+        </button>
+      </div>
       <table>
         <thead>
           <tr>
@@ -46,6 +53,25 @@
       </form>
     </template>
   </Modal>
+
+  <!-- Modal de novos usuarios -->
+  <Modal :show="showAddUserModal" @close="showAddUserModal = false" maxWidth="md">
+    <template v-if="selectedUser">
+      <h1 class="text-center text-2xl font-bold mb-10">Novo Usuario</h1>
+      <form @submit.prevent="addUser">
+        <input type="text" v-model="nome" placeholder="Nome" required />
+        <input type="email" v-model="email" placeholder="Email" required />
+        <select v-model="role" required>
+          <option value="" disabled selected>Selecione uma permissão</option>
+          <option value="1">PADRÃO</option>
+          <option value="2">ADMIN</option>
+        </select>
+        <input type="password" v-model="senha" placeholder="Senha" required />
+        <input type="password" v-model="confirmSenha" placeholder="Confirmar Senha" required />
+        <button type="submit">Adicionar</button>
+      </form>
+    </template>
+  </Modal>
 </template>
 
 <script setup>
@@ -62,11 +88,21 @@ const selectedUser = ref({
   role: '',
 });
 const showEditModal = ref(false);
+const showAddUserModal = ref(false);
+const nome = ref('');
+const email = ref('');
+const senha = ref('');
+const confirmSenha = ref('');
+const role = ref('');
 
 const editar = (user) => {
   selectedUser.value = { ...user };
   showEditModal.value = true;
 };
+
+const adicionarUsuario = () => {
+  showAddUserModal.value = true;
+}
 
 const fetchUsers = async () => {
   try {
@@ -84,6 +120,7 @@ const fetchUsers = async () => {
     });
 
     users.value = response.data;
+    console.log(users);
   } catch (error) {
     console.error('Erro ao buscar usuários:', error);
   }
@@ -133,6 +170,34 @@ const editUser = async () => {
     showEditModal.value = false;
   } catch (error) {
     console.error('Erro ao atualizar os dados:', error);
+  }
+};
+
+const addUser = async () => {
+  try {
+    const formData = {
+      name: nome.value,
+      email: email.value,
+      role: role.value,
+      password: senha.value,
+      password_confirmation: confirmSenha.value,
+    };
+
+    const token = localStorage.getItem('auth_token');
+    if (!token) {
+      console.error('Token não encontrado');
+      return;
+    }
+    await axios.post(`/api/register`, formData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    fetchUsers();
+    showAddUserModal.value = false;
+  } catch (error) {
+    console.error('Erro ao cadastrar o usuario:', error);
   }
 };
 

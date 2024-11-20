@@ -69,7 +69,9 @@ input, select, textarea {
 input[type="text"],
 input[type="tel"],
 input[type="date"],
-input[type="time"] {
+input[type="time"],
+input[type="email"],
+input[type="password"] {
     border-color: #333;
     border-radius: 5px;
 }
