@@ -44,11 +44,10 @@
         <input type="hidden" v-model="selectedUser.id" placeholder="Nome" required />
         <input type="text" v-model="selectedUser.name" placeholder="Nome" required />
         <input type="email" v-model="selectedUser.email" placeholder="Email" required />
-        <select v-model="selectedUser.role" required>
-          <option value="" disabled selected>Selecione uma permissão</option>
-          <option v-for="role in roles" :key="role.value" :value="role.value">
-            {{ role.label }}
-          </option>
+        <select v-model="roleForSelect" required>
+          <option value="" disabled>Selecione uma permissão</option>
+          <option value="1">PADRÃO</option>
+          <option value="2">ADMIN</option>
         </select>
         <button type="submit">Salvar</button>
       </form>
@@ -107,6 +106,7 @@ import { ref, onMounted } from 'vue';
 import axios from 'axios';
 import Navbar from '@/Components/Navbar.vue';
 import Modal from '../Components/Modal.vue';
+import { computed } from "vue";
 
 const users = ref([]);
 const selectedUser = ref({
@@ -127,10 +127,25 @@ const senha = ref('');
 const confirmSenha = ref('');
 const role = ref('');
 
-const roles = [
-  { value: "1", label: "PADRÃO" },
-  { value: "2", label: "ADMIN" }
-]
+// Mapeamento para converter os valores
+const roleMapping = {
+  PADRÃO: "1",
+  ADMIN: "2",
+};
+const reverseRoleMapping = {
+  "1": "PADRÃO",
+  "2": "ADMIN",
+};
+
+// Computed para gerenciar o v-model do select
+const roleForSelect = computed({
+  get() {
+    return roleMapping[selectedUser.value.role] || ""; // Acessa o valor do ref
+  },
+  set(value) {
+    selectedUser.value.role = reverseRoleMapping[value] || ""; // Atualiza o valor do ref
+  },
+});
 
 const editar = (user) => {
   selectedUser.value = { ...user };
@@ -202,7 +217,7 @@ const editUser = async () => {
       id: selectedUser.id,
       name: selectedUser.value.name,
       email: selectedUser.value.email,
-      role: selectedUser.value.role,
+      role: parseInt(roleMapping[selectedUser.value.role] || "0", 10),
     };
 
     const token = localStorage.getItem('auth_token');
