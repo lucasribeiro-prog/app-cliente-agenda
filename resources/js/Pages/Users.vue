@@ -28,7 +28,7 @@
             <td>{{ user.role }}</td>
             <td>
               <button class="editar bg-teal-500" @click="editar(user)"><i class="fas fa-pencil-alt"></i></button>
-              <button class="remover bg-red-600" @click="deleteUser(user.id)"><i class= "fa-solid fa-trash"></i></button>
+              <button class="remover bg-red-600" @click="remover(user)"><i class= "fa-solid fa-trash"></i></button>
             </td>
           </tr>
         </tbody>
@@ -54,6 +54,17 @@
       </form>
     </template>
   </Modal>
+
+    <!-- Modal de confirmação de remoção -->
+    <Modal :show="showDeleteModal" @close="showDeleteModal = false" maxWidth="sm">
+      <template v-if="selectedUser">
+        <h1 class="text-center text-red-600 text-2xl font-bold mb-4">Atenção!</h1>
+        <p class="text-center mb-10 text-lg text-red-600">Deseja remover o usuario?</p>
+        <div class="flex justify-center">
+          <button @click="deleteUser" class="delete bg-red-500 text-white py-2 px-4 rounded hover:bg-red-700" type="button">Sim</button>
+        </div>
+      </template>
+    </Modal>
 
   <!-- Modal de novos usuarios -->
   <Modal :show="showAddUserModal" @close="showAddUserModal = false" maxWidth="md">
@@ -107,6 +118,7 @@ const selectedUser = ref({
 const showEditModal = ref(false);
 const showAddUserModal = ref(false);
 const showFeedbackModal  = ref(false);
+const showDeleteModal = ref(false);
 const isError = ref(false);
 const message = ref('');
 const nome = ref('');
@@ -123,6 +135,11 @@ const roles = [
 const editar = (user) => {
   selectedUser.value = { ...user };
   showEditModal.value = true;
+};
+
+const remover = (user) => {
+  selectedUser.value = { ...user };
+  showDeleteModal.value = true;
 };
 
 const adicionarUsuario = () => {
@@ -150,7 +167,7 @@ const fetchUsers = async () => {
   }
 };
 
-const deleteUser = async (userId) => {
+const deleteUser = async () => {
   try {
     const token = localStorage.getItem('auth_token');
     if (!token) {
@@ -158,14 +175,23 @@ const deleteUser = async (userId) => {
       return;
     }
 
-    await axios.delete(`/api/users/${userId}`, {
+    await axios.delete(`/api/users/${selectedUser.value.id}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       }
     });
 
+    isError.value = false;
+    message.value = 'Usuario excluido com sucesso!';
+
     fetchUsers();
+    showDeleteModal.value = false;
+    showFeedbackModal.value = true;
   } catch (error) {
+
+    isError.value = true;
+    showFeedbackModal.value = true;
+    message.value = 'Erro ao deletar usuário.';
     console.error('Erro ao deletar usuário:', error);
   }
 };
