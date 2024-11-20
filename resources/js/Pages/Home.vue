@@ -29,31 +29,38 @@
                   <td>{{ item.consultor }}</td>
                   <td>
                     <div class="tooltip">
-                      <button class="detalhes bg-neutral-600" @click="viewDetails(item.id)">
+                      <button class="bg-neutral-600 hover:bg-neutral-900" @click="viewDetails(item.id)">
                         <i class="fas fa-eye"></i>
                       </button>
                       <span class="tooltip-text">Detalhes</span>
                     </div>
 
                     <div class="tooltip">
-                      <button class="detalhes bg-teal-600" @click="reschedule(item.id)">
+                      <button class="bg-teal-600 hover:bg-teal-800" @click="reschedule(item.id)">
                         <i class="fas fa-undo"></i>
                       </button>
                       <span class="tooltip-text">Remarcar</span>
                     </div>  
                     
                     <div class="tooltip">
-                      <button v-if="currentTable.type === 'aguardando'" class="detalhes bg-green-600" @click="pagamento(item.id)">
+                      <button v-if="currentTable.type === 'aguardando'" class="bg-green-600 hover:bg-green-800" @click="pagamento(item.id)">
                         <i class="fas fa-check"></i>
                       </button>
                       <span class="tooltip-text">Pago</span>
                     </div>
 
                     <div class="tooltip">
-                      <button v-if="currentTable.type === 'remarcar' || currentTable.type === 'aguardando'" class="detalhes bg-red-600" @click="remover(item.id)">
+                      <button v-if="currentTable.type === 'remarcar' || currentTable.type === 'aguardando'" class="bg-red-600 hover:bg-red-800" @click="remover(item.id)">
                         <i class= "fa-solid fa-trash"></i>
                       </button>
                       <span class="tooltip-text">Remover</span>
+                    </div>
+
+                    <div class="tooltip">
+                      <button v-if="currentTable.type === 'andamento'" class="bg-blue-900 hover:bg-blue-950" @click="processo(item.id)">
+                        <i class="fa-solid fa-plus"></i>
+                      </button>
+                      <span class="tooltip-text">N° do processo</span>
                     </div>
                   </td>
                 </tr>
@@ -126,6 +133,19 @@
         </div>
       </template>
     </Modal>
+
+    <!-- Modal para adicionar o numero do processo -->
+    <Modal :show="showModalProcesso" @close="showModalProcesso = false" maxWidth="md">
+      <template v-if="selectedAgendamento">
+        <h1 class="text-center text-2xl font-bold mb-10">Número do processo</h1>
+        <form @submit.prevent="submitProcesso">
+          <input type="text" v-model="process" placeholder="Adiconar processo" required />
+          <div class="flex justify-end">
+            <button type="submit">Adicionar</button>
+          </div>
+        </form>
+      </template>
+    </Modal>
   </div>
 </template>
 
@@ -153,6 +173,7 @@ const currentPage = ref(1);
 const itemsPerPage = ref(6);
 const totalItems = ref(0);
 const totalPages = computed(() => Math.ceil(totalItems.value / itemsPerPage.value));
+const process = ref('');
 
 const headerColors = {
   aguardando: 'linear-gradient(to bottom, rgb(215, 140, 10), rgb(245, 158, 11))',
@@ -163,6 +184,7 @@ const headerColors = {
 const showDetailsModal = ref(false);
 const showRescheduleModal = ref(false);
 const showDeleteModal = ref(false);
+const showModalProcesso = ref(false);
 const showPayModal = ref(false);
 const selectedAgendamento = ref(null);
 
@@ -257,6 +279,8 @@ const selectAgendamento = (id, modalType) => {
       showDeleteModal.value = true;
     } else if (modalType === 'pagamento') {
       showPayModal.value = true;
+    } else if (modalType === 'processo') {
+      showModalProcesso.value = true;
     }
   }
 };
@@ -266,6 +290,7 @@ const viewDetails = (id) => selectAgendamento(id, 'details');
 const reschedule = (id) => selectAgendamento(id, 'reschedule');
 const remover = (id) => selectAgendamento(id, 'remover');
 const pagamento = (id) => selectAgendamento(id, 'pagamento');
+const processo = (id) => selectAgendamento(id, 'processo');
 
 const confirmarRemocao = async () => {
   try {
@@ -302,9 +327,38 @@ const submitForm = async () => {
     await axios.put(`http://localhost:8000/api/agendar/${selectedAgendamento.value.id}/reschedule`, formData);
     selectedAgendamento.value = null;
     showRescheduleModal.value = false;
-    await loadTable('remarcar');
+    await loadTable(currentTable.value.type);
   } catch (error) {
     console.error('Erro ao tentar atualizar os dados:', error);
+  }
+};
+
+const submitProcesso = async () => {
+  try {
+
+    const response = await axios.post(`http://localhost:8000/api/agendar`, {
+      agendamento_id: selectedAgendamento.value.id,
+      process: process.value,
+    });
+    message.value = response.data.message;
+
+    await loadTable(currentTable.value.type);
+
+    process.value = "";
+    selectedAgendamento.value = null;
+    showModalProcesso.value = false;
+
+  } catch (error) {
+    if (error.response && error.response.status === 422) {
+      message.value = error.response.data.message || 'Erro inserir o número do processo.';
+    } else {
+      message.value = 'Ocorreu um erro inesperado. Tente novamente mais tarde.';
+    }
+
+    isError.value = true;
+    showFeedbackModal.value = true;
+    console.error('Erro ao tentar atualizar os dados:', error);
+    message.value = 'Erro ao tentar inserir um registro.';
   }
 };
 
