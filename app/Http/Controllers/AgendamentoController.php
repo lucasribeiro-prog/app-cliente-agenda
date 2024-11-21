@@ -6,6 +6,7 @@ use App\Models\Agendamento;
 use App\Models\Cliente;
 use App\Models\Contato;
 use App\Models\Link;
+use App\Models\Processo;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
@@ -28,6 +29,7 @@ class AgendamentoController extends Controller
             'contatos:id,telefone',
             'categorias:id,categoria',
             'atendimentos:id,antendimento',
+            'processos:id,num_processo'
         ]);
     
         if ($status) {
@@ -83,10 +85,15 @@ class AgendamentoController extends Controller
             } else if($request->has('link')) {
                 $link = new Link();
                 $link->link_reuniao = $request->get('link');
-                print_r($link);
                 $link->save();
 
                 $agendamento->id_link = $link->id;
+            } else if($request->has('process')){
+                $processo = new Processo();
+                $processo->num_processo = $request->get('process');  
+                $processo->save();
+
+                $agendamento->id_processo = $processo->id;
             }
             
             $agendamento->save();

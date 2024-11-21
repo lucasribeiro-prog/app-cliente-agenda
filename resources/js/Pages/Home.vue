@@ -57,7 +57,7 @@
                     </div>
 
                     <div class="tooltip">
-                      <button v-if="currentTable.type === 'andamento'" class="bg-blue-900 hover:bg-blue-950" @click="processo(item.id)">
+                      <button v-if="currentTable.type === 'andamento' && item.id_processo == null" class="bg-blue-900 hover:bg-blue-950" @click="processo(item.id)">
                         <i class="fa-solid fa-plus"></i>
                       </button>
                       <span class="tooltip-text">N° do processo</span>
@@ -86,6 +86,7 @@
     <Modal :show="showDetailsModal" @close="showDetailsModal = false">
       <template v-if="selectedAgendamento">
         <h1 class="text-center text-2xl font-bold mb-10">{{ selectedAgendamento.client }}</h1>
+        <p v-if="selectedAgendamento.num_process != null"><strong>N° do processo:</strong> {{ selectedAgendamento.num_process }}</p>
         <p><strong>CPF:</strong> {{ formatarCPF(selectedAgendamento.cpf) }}</p>
         <p><strong>Telefone:</strong> {{ formatarTelefone(selectedAgendamento.telefone) }}</p>
         <p><strong>Data do leilão:</strong> {{ formatarData(selectedAgendamento.data_leilao) }}</p>
@@ -174,6 +175,7 @@ const itemsPerPage = ref(6);
 const totalItems = ref(0);
 const totalPages = computed(() => Math.ceil(totalItems.value / itemsPerPage.value));
 const process = ref('');
+const message = ref('');
 
 const headerColors = {
   aguardando: 'linear-gradient(to bottom, rgb(215, 140, 10), rgb(245, 158, 11))',
@@ -237,6 +239,8 @@ const loadTable = async (type, page = 1) => {
         data_leilao: item.data_leilao,
         matricula: item.clientes.matricula,
         observacao: item.observacao,
+        id_processo: item.id_processo,
+        num_process: item.processos ? item.processos.num_processo : null,
         id: item.id,
       })),
     };
@@ -336,27 +340,24 @@ const submitForm = async () => {
 const submitProcesso = async () => {
   try {
 
-    const response = await axios.post(`http://localhost:8000/api/agendar`, {
+    await axios.post(`http://localhost:8000/api/agendar`, {
       agendamento_id: selectedAgendamento.value.id,
       process: process.value,
+      status: 1,
     });
-    message.value = response.data.message;
+    message.value = 'Processo adicionado com sucesso!';
 
-    await loadTable(currentTable.value.type);
-
-    process.value = "";
-    selectedAgendamento.value = null;
+    selectedAgendamento.value.num_process = process.value;
+    selectedAgendamento.value.id_status = statusMap.andamento;
     showModalProcesso.value = false;
 
-  } catch (error) {
-    if (error.response && error.response.status === 422) {
-      message.value = error.response.data.message || 'Erro inserir o número do processo.';
-    } else {
-      message.value = 'Ocorreu um erro inesperado. Tente novamente mais tarde.';
-    }
+    await loadTable(currentTable.value.type);
+    process.value = "";
 
-    isError.value = true;
-    showFeedbackModal.value = true;
+  } catch (error) {
+    message.value = 'Erro ao inserir número do processo.';
+    console.error('Erro ao inserir número do processo:', error);
+
     console.error('Erro ao tentar atualizar os dados:', error);
     message.value = 'Erro ao tentar inserir um registro.';
   }
@@ -364,7 +365,6 @@ const submitProcesso = async () => {
 
 // Funções de formatação
 const formatarData = (data) => new Date(data).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
-const formatarHora = (hora) => hora.slice(0, 5);
 const formatarCPF = (cpf) => cpf ? cpf.replace(/(\d{3})(\d)/g, '$1.$2').replace(/(\d{3})(\d{2})$/, '$1-$2') : '';
 const formatarTelefone = (telefone) => telefone ? telefone.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3') : '';
 

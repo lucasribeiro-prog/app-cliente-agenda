@@ -11,6 +11,7 @@ use App\Models\Cliente;
 use App\Models\Contato;
 use App\Models\StatusAgendamento;
 use App\Models\Link;
+use App\Models\Processo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Agendamento extends Model
@@ -84,5 +85,10 @@ class Agendamento extends Model
     public function links()
     {
         return $this->belongsTo(Link::class, 'id_link');
+    }
+
+    public function processos()
+    {
+        return $this->belongsTo(Processo::class, 'id_processo');
     }
 }
