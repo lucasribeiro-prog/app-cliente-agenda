@@ -47,7 +47,7 @@
                   </div>
 
                   <div class="tooltip">
-                    <button v-if="user.role === 'ADMIN'" class="atendido bg-green-400" @click="openModal(agendamento, 'atendido')">
+                    <button v-if="user.role === 'ADMIN'" class="atendido bg-green-500" @click="openModal(agendamento, 'atendido')">
                       <i class="fas fa-check"></i>
                     </button>
                     <span class="tooltip-text">Antendido</span>
@@ -83,7 +83,7 @@
     </div>
 
     <!-- Modal para exibir detalhes do agendamento -->
-    <Modal :show="showDetailsModal" @close="showDetailsModal = false">
+    <Modal :show="showDetailsModal" @close="showDetailsModal = false" maxWidth="md">
       <template v-if="selectedAgendamento">
         <h1 class="text-center text-2xl font-bold mb-10">{{ selectedAgendamento.clientes.nome }}</h1>
         <p><strong>CPF:</strong> {{ formatarCPF(selectedAgendamento.clientes.cpf) }}</p>
@@ -99,7 +99,7 @@
     </Modal>
 
     <!-- Modal edição do agendamento -->
-    <Modal :show="showEditModal" @close="showEditModal = false">
+    <Modal :show="showEditModal" @close="showEditModal = false" maxWidth="md">
       <template v-if="selectedAgendamento">
         <h1 class="text-center text-2xl font-bold mb-10">Editar Agendamento</h1>
         <form @submit.prevent="submitForm">
@@ -110,7 +110,9 @@
           <input type="date" v-model="selectedAgendamento.data" required />
           <input type="time" v-model="selectedAgendamento.hora" required />
           <input type="text" v-model="selectedAgendamento.clientes.matricula" placeholder="Matrícula do Imóvel" required />
-          <button type="submit">Salvar</button>
+          <div class="flex justify-end">
+            <button type="submit">Salvar</button>
+          </div>
         </form>
       </template>
     </Modal>
@@ -143,12 +145,14 @@
     </Modal>
 
     <!-- Modal de status do atendimento -->
-    <Modal :show="showStatusModal" @close="showStatusModal = false">
+    <Modal :show="showStatusModal" @close="showStatusModal = false" maxWidth="md">
       <template v-if="selectedAgendamento">
         <h2 class="font-bold text-lg">{{ modalTipo === 'atendido' ? 'Cliente Atendido' : 'Não Compareceu' }}</h2>
         <p class="mb-9">{{ selectedAgendamento.clientes.nome }} - {{ formatarHora(selectedAgendamento.hora) }}</p>
         <textarea v-model="observacao" placeholder="Escreva uma observação (opcional)"></textarea>
-        <button :class="modalTipo === 'atendido' ? 'bg-green-400' : 'bg-red-500'"  @click="submitStatus">Enviar</button>
+        <div class="flex justify-end">
+          <button :class="modalTipo === 'atendido' ? 'bg-green-500 hover:bg-green-700' : 'bg-red-500 hover:bg-red-700'"  @click="submitStatus">Enviar</button>
+        </div>
       </template>
     </Modal>
     

@@ -96,7 +96,7 @@
             <i class="fa-regular fa-file-pdf text-lg"></i>
           </a>
         </p>
-        <p><strong>Observação:</strong> {{ formatarCPF(selectedAgendamento.observacao) }} </p>
+        <p v-if="selectedAgendamento.observacao != null"><strong>Observação:</strong> {{ formatarCPF(selectedAgendamento.observacao) }} </p>
       </template>
     </Modal>
 
@@ -108,7 +108,9 @@
           <input type="hidden" v-model="selectedAgendamento.id" placeholder="Id" required />
           <input type="date" v-model="selectedAgendamento.data" required />
           <input type="time" v-model="selectedAgendamento.hora" required />
-          <button type="submit">Agendar</button>
+          <div class="flex justify-end">
+            <button type="submit">Agendar</button>
+          </div>
         </form>
       </template>
     </Modal>
