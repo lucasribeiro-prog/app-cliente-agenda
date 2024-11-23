@@ -1,9 +1,9 @@
 <template>
   <nav class="navbar">
       <ul>
-          <li class="home"><Link href="/home">Início</Link></li>
-          <li class="agendar"><Link href="/agendar">Agendar</Link></li>
-          <li class="consultar"><Link  href="/consultar">Consultar</Link></li>
+          <li class="home"><Link class="hover:bg-white hover:text-black hover:rounded-md" href="/">Início</Link></li>
+          <li class="agendar"><Link class="hover:bg-white hover:text-black hover:rounded-md" href="/agendar">Agendar</Link></li>
+          <li class="consultar"><Link class="hover:bg-white hover:text-black hover:rounded-md"  href="/consultar">Consultar</Link></li>
       </ul>
 
         <!-- Botão de perfil e logout -->
