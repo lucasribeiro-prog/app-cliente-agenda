@@ -5,8 +5,8 @@ import Consult from '../Pages/Consultar.vue';
 import Users from '@/Pages/Users.vue';
 
 const routes = [
-  { path: '/', component: Home, name: 'login' },
-  { path: '/home', component: Home, name: 'home' },
+  { path: '/', component: Home, name: 'home' },
+  { path: '/login', component: Home, name: 'login' },
   { path: '/agendar', component: Schedule, name: 'schedule' },
   { path: '/consultar', component: Consult, name: 'consult' },
   { path: '/users', component: Users, name: 'users' },

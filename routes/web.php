@@ -5,13 +5,14 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\UserController;
 
-Route::get('/', function () {
+/*Route::get('/', function () {
     return Inertia::render('Auth/Login');
-});
+});*/
 
-Route::get('/home', function () {
+Route::get('/', function () {
     return Inertia::render('Home');
 })->middleware(['auth', 'verified'])->name('home');
 
