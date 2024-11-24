@@ -61,7 +61,17 @@
                   </div>
                   
                   <div class="tooltip">
-                    <button v-if="user.role === 'ADMIN' && agendamento.id_link == null" class="adicionar_link bg-cyan-700" @click="adicionarLink(agendamento)">
+                    <button
+                    v-if="agendamento.id_link == null"
+                    :disabled="user.role !== 'ADMIN'"
+                    class="adicionar_link bg-cyan-700" 
+                    @click="adicionarLink(agendamento)"
+                    :class="
+                    {
+                      'disabled-button': user.role !== 'ADMIN',
+                      'alert-button': user.role === 'ADMIN' && agendamento.id_link == null
+                    }
+                    ">
                       <i class="fa-solid fa-link-slash"></i>
                     </button>
                     <span class="tooltip-text">Adiconar Link</span>
@@ -129,7 +139,7 @@
     </Modal>
 
     <!-- Modal para exibir feedback de atualização -->
-    <Modal :show="showFeedbackModal" @close="showFeedbackModal = false">
+    <Modal :show="showFeedbackModal" @close="showFeedbackModal = false" maxWidth="md">
       <!-- Ícone de Sucesso -->
       <div class="mb-4">
           <svg v-if="isError" class="w-12 h-12 text-red-500 mx-auto" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -276,8 +286,11 @@ const buscarAgendamentos = async () => {
     agendamentos.forEach(agendamento => {
       const date = new Date(agendamento.data);
       const weekDayIndex = date.getDay();
-      if(agendamento.id_status == null) {
-        days.value[weekDayIndex].agendamentos.push(agendamento);
+
+      if (weekDayIndex >= 0 && weekDayIndex <= 4) {
+        if (agendamento.id_status == null) {
+          days.value[weekDayIndex].agendamentos.push(agendamento);
+        }
       }
     });
 
@@ -456,6 +469,14 @@ td {
 
 .adicionar_link:hover, .copiar_link:hover {
   background-color: rgb(22 78 99);
+}
+
+.alert-button {
+  background-color: rgb(245 158 11);
+}
+
+.alert-button:hover {
+  background-color: rgb(180 83 9);
 }
 
 button {

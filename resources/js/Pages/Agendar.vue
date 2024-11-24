@@ -47,7 +47,7 @@
             </form>
 
             <!-- Modal para exibir feedback do agendamento -->
-            <Modal :show="showFeedbackModal" @close="showFeedbackModal = false">
+            <Modal :show="showFeedbackModal" @close="showFeedbackModal = false" maxWidth="md">
                  <!-- Ícone de Sucesso -->
                 <div class="mb-4">
                     <svg v-if="isError" class="w-12 h-12 text-red-500 mx-auto" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -58,9 +58,8 @@
                     </svg>
                 </div>
                 <h1 :class="isError ? 'text-red-700' : 'text-green-700'" class="text-center text-2xl font-bold mb-2">
-                    {{ isError ? 'Erro ao criar agendamento' : 'Sucesso!' }}
+                    {{ isError ? 'Erro ao criar agendamento' : 'Agendamento realizado com sucesso!' }}
                 </h1>
-                <p :class="isError ? 'text-center text-red-600' : 'text-center text-gray-600'">{{ message }}</p>
             </Modal>
         </div>
     </div>
@@ -155,12 +154,7 @@ export default {
             matricula.value = '';
         } catch (error) {
             if (error.response && error.response.status === 422) {
-                message.value = error.response.data.message || 'Erro ao processar o agendamento.';
-                
-                const errorDetails = error.response.data.errors;
-                if (errorDetails && errorDetails.data_leilao) {
-                    message.value += ` ${errorDetails.data_leilao[0]}`;
-                }
+                message.value = 'Erro ao processar o agendamento.';
             } else {
                 message.value = 'Ocorreu um erro inesperado. Tente novamente mais tarde.';
             }
