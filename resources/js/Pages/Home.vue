@@ -208,11 +208,19 @@ const loadTable = async (type, page = 1) => {
   currentPage.value = page;
 
   try {
+    const token = localStorage.getItem('auth_token');
+    if (!token) {
+      console.error('Token não encontrado');
+      return;
+    }
     const response = await axios.get(`http://localhost:8000/api/agendar?page=${page}`, {
       params: {
         page: currentPage.value,
         limit: itemsPerPage.value,
         status: statusMap[type],
+      },
+      headers: {
+        Authorization: `Bearer ${token}`,
       },
     });
 
@@ -300,7 +308,17 @@ const processo = (id) => selectAgendamento(id, 'processo');
 
 const confirmarRemocao = async () => {
   try {
-    await axios.delete(`http://localhost:8000/api/agendar/${selectedAgendamento.value.id}`);
+    const token = localStorage.getItem('auth_token');
+    if (!token) {
+      console.error('Token não encontrado');
+      return;
+    };
+
+    await axios.delete(`http://localhost:8000/api/agendar/${selectedAgendamento.value.id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
     showDeleteModal.value = false;
     selectedAgendamento.value = null;
     await loadTable(currentTable.value.type);
@@ -311,9 +329,20 @@ const confirmarRemocao = async () => {
 
 const confirmarPagamento = async () => {
   try {
+    const token = localStorage.getItem('auth_token');
+    if (!token) {
+      console.error('Token não encontrado');
+      return;
+    };
+
     await axios.post('http://localhost:8000/api/agendar', {
       agendamento_id: selectedAgendamento.value.id,
       status: 1,
+    }, 
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     });
     showPayModal.value = false;
     selectedAgendamento.value = null;
@@ -325,12 +354,22 @@ const confirmarPagamento = async () => {
 
 const submitForm = async () => {
   try {
+    const token = localStorage.getItem('auth_token');
+    if (!token) {
+      console.error('Token não encontrado');
+      return;
+    };
+
     const formData = {
       id: selectedAgendamento.value.id,
       data: selectedAgendamento.value.data,
       hora: selectedAgendamento.value.hora,
     };
-    await axios.put(`http://localhost:8000/api/agendar/${selectedAgendamento.value.id}/reschedule`, formData);
+    await axios.put(`http://localhost:8000/api/agendar/${selectedAgendamento.value.id}/reschedule`, formData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
     selectedAgendamento.value = null;
     showRescheduleModal.value = false;
     await loadTable(currentTable.value.type);
@@ -341,11 +380,21 @@ const submitForm = async () => {
 
 const submitProcesso = async () => {
   try {
+    const token = localStorage.getItem('auth_token');
+    if (!token) {
+      console.error('Token não encontrado');
+      return;
+    };
 
     await axios.post(`http://localhost:8000/api/agendar`, {
       agendamento_id: selectedAgendamento.value.id,
       process: process.value,
       status: 1,
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     });
     message.value = 'Processo adicionado com sucesso!';
 

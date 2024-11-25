@@ -205,6 +205,12 @@ const toggleDropdown = (index) => {
 
 const submitForm = async () => {
   try {
+    const token = localStorage.getItem('auth_token');
+    if (!token) {
+      console.error('Token não encontrado');
+      return;
+    };
+
     const formData = {
       id: selectedAgendamento.value.id,
       nome: selectedAgendamento.value.clientes.nome,
@@ -215,7 +221,11 @@ const submitForm = async () => {
       matricula: selectedAgendamento.value.clientes.matricula,
     };
 
-    const response = await axios.put(`http://localhost:8000/api/agendar/${selectedAgendamento.value.id}`, formData);
+    const response = await axios.put(`http://localhost:8000/api/agendar/${selectedAgendamento.value.id}`, formData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
     message.value = response.data.message;
 
     await buscarAgendamentos();
@@ -245,12 +255,25 @@ const submitForm = async () => {
 
 const submitLink = async () => {
   try {
+    const token = localStorage.getItem('auth_token');
+    if (!token) {
+      console.error('Token não encontrado');
+      return;
+    };
 
-    const response = await axios.post(`http://localhost:8000/api/agendar`, {
-      agendamento_id: selectedAgendamento.value.id,
-      link: link.value,
-    });
-    message.value = response.data.message;
+    await axios.post(
+      `http://localhost:8000/api/agendar`,
+      {
+        agendamento_id: selectedAgendamento.value.id,
+        link: link.value,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    message.value = 'Link adicionado com sucesso';
 
     await buscarAgendamentos();
 
@@ -267,7 +290,7 @@ const submitLink = async () => {
 
     isError.value = true;
     showFeedbackModal.value = true;
-    console.error('Erro ao tentar atualizar os dados:', error);
+    console.error('Erro inserir o link da reuniao:', error);
     message.value = 'Erro ao tentar inserir um registro.';
   }
 };
@@ -275,7 +298,16 @@ const submitLink = async () => {
 
 const buscarAgendamentos = async () => {
   try {
-    const response = await axios.get('http://localhost:8000/api/consultar');
+    const token = localStorage.getItem('auth_token');
+    if (!token) {
+      console.error('Token não encontrado');
+      return;
+    }
+    const response = await axios.get('http://localhost:8000/api/consultar', {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
     const agendamentos = response.data;
 
     days.value.forEach(day => {
@@ -311,13 +343,27 @@ const submitStatus = async () => {
   const status = modalTipo.value === 'atendido' ? 3 : 2;
 
   try {
+    const token = localStorage.getItem('auth_token');
+    if (!token) {
+      console.error('Token não encontrado');
+      return;
+    };
+
     await axios.post('http://localhost:8000/api/agendar', {
-      agendamento_id: selectedAgendamento.value.id,
-      status: status,
-      observacao: observacao.value,
-    });
+        agendamento_id: selectedAgendamento.value.id,
+        status: status,
+        observacao: observacao.value,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+  );
 
     showStatusModal.value = false;
+    observacao.value = "";
+    selectedAgendamento.value = null;
 
     await buscarAgendamentos();
   } catch (error) {

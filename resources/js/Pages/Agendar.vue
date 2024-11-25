@@ -125,6 +125,12 @@ export default {
         const submitForm = async () => {
         try {
 
+            const token = localStorage.getItem('auth_token');
+            if (!token) {
+            console.error('Token não encontrado');
+            return;
+            };
+
             const formData = {
                 id_usuario: localIdUsuario.value,
                 nome: nome.value,
@@ -138,7 +144,11 @@ export default {
                 matricula: matricula.value,
             };
             
-            const response = await axios.post('http://localhost:8000/api/agendar', formData);
+            const response = await axios.post('http://localhost:8000/api/agendar', formData, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
             
             message.value = response.data.message;
             showFeedbackModal.value = true;
