@@ -22,6 +22,8 @@ class AgendamentoController extends Controller
     {
         $page = $request->input('page', 1);
         $status = $request->input('status');
+        $limit = $request->input('limit', 6);
+        $user = Auth::user();
     
         $query = Agendamento::with([
             'usuarios:id,name,role',
@@ -32,14 +34,21 @@ class AgendamentoController extends Controller
             'processos:id,num_processo'
         ]);
     
+        // Aplicar filtro pelo status, se fornecido
         if ($status) {
-            $query->where('id_status', $status); 
+            $query->where('id_status', $status);
         }
     
-        $agendamentos = $query->paginate(6, ['*'], 'page', $page);
+        // Aplicar filtro pelo usuário, se não for ADMIN
+        if ($user->role !== 'ADMIN') {
+            $query->where('id_usuario', $user->id);
+        }
+    
+        $agendamentos = $query->paginate($limit, ['*'], 'page', $page);
     
         return response()->json($agendamentos);
     }
+    
 
     public function consultar()
     {
