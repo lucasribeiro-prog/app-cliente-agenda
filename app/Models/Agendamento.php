@@ -13,10 +13,12 @@ use App\Models\StatusAgendamento;
 use App\Models\Link;
 use App\Models\Processo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Laravel\Sanctum\HasApiTokens;
 
 class Agendamento extends Model
 {
     use SoftDeletes;
+    use HasApiTokens;
     
     protected $fillable = ['id_cliente', 'id_contato', 'categoria', 'data_leilao', 'data', 'hora'];
 

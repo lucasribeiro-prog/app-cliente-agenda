@@ -33,7 +33,20 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        $user = Auth::user();
+        $user = $request->user();
+
+        $token = null;
+    
+        // Verifica se o usuário está autenticado e tenta gerar o token
+        if ($user) {
+            try {
+                $token = $user->createToken('Token de Acesso')->plainTextToken;
+            } catch (\Exception $e) {
+                // Handle exception if necessary
+            }
+        }
+
+        $request->session()->put('auth_token', $token);
 
         return redirect()->intended(route('home', absolute: false))->with('auth', [
             'user' => [
