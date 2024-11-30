@@ -21,6 +21,7 @@
     "dependencies": {
         "@fortawesome/fontawesome-free": "^6.6.0",
         "@inertiajs/inertia": "^0.11.1",
-        "vue-router": "^4.4.5"
+        "vue-router": "^4.4.5",
+        "ziggy": "^2.4.0"
     }
 }
