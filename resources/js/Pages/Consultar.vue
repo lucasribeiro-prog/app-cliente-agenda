@@ -150,7 +150,7 @@
           </svg>
       </div>
       <h1 :class="isError ? 'text-red-700' : 'text-green-700'" class="text-center text-2xl font-bold mb-2">
-          {{ isError ? 'Erro ao atualizar os dados' : 'Dados atualizados com sucesso!' }}
+          {{ isError ? message : 'Dados atualizados com sucesso!' }}
       </h1>
     </Modal>
 
@@ -249,7 +249,6 @@ const submitForm = async () => {
     isError.value = true;
     showFeedbackModal.value = true;
     console.error('Erro ao tentar atualizar os dados:', error);
-    message.value = 'Erro ao tentar atualizar os dados.';
   }
 };
 

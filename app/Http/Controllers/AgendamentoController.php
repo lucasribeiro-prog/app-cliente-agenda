@@ -90,6 +90,16 @@ class AgendamentoController extends Controller
             $agendamento->id_status = $request->get('status');
 
             if ($request->has('observacao')) {
+                $rules = [
+                    'observacao' => 'nullable|string|max:255',
+                ];
+            
+                $feedback = [
+                    'observacao.string' => 'O campo Observação deve ser um texto válido.',
+                    'observacao.max' => 'O campo Observação não pode ter mais de 255 caracteres.',
+                ];
+            
+                $request->validate($rules, $feedback);
                 $agendamento->observacao = $request->get('observacao');
             } else if($request->has('link')) {
                 $link = new Link();
@@ -188,6 +198,12 @@ class AgendamentoController extends Controller
             'cpf' => preg_replace('/[^0-9]/', '', $request->get('cpf')),
             'telefone' => preg_replace('/[^0-9]/', '', $request->get('telefone')),
         ]);
+
+        // Valida os dados
+        $rules = Agendamento::rules();
+
+        $request->validate($rules, Agendamento::feedback());
+
 
         $cliente = $agendamento->clientes;
         $cliente->nome = $request->get('nome');
