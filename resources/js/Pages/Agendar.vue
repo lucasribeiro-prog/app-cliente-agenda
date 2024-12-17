@@ -58,7 +58,7 @@
                     </svg>
                 </div>
                 <h1 :class="isError ? 'text-red-700' : 'text-green-700'" class="text-center text-2xl font-bold mb-2">
-                    {{ isError ? 'Erro ao criar agendamento' : 'Agendamento realizado com sucesso!' }}
+                    {{ isError ? message : 'Agendamento realizado com sucesso!' }}
                 </h1>
             </Modal>
         </div>
@@ -166,7 +166,7 @@ export default {
             if (error.response && error.response.status === 422) {
                 message.value = 'Erro ao processar o agendamento.';
             } else {
-                message.value = 'Ocorreu um erro inesperado. Tente novamente mais tarde.';
+                message.value = error.response.data.error;
             }
             isError.value = true;
             showFeedbackModal.value = true;
