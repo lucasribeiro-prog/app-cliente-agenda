@@ -37,3 +37,7 @@ EXPOSE 8000
 
 # Comando para iniciar o servidor Laravel
 CMD php artisan serve --host=0.0.0.0 --port=8000
+
+CMD APP_PORT_NUMERIC=${APP_PORT//\"/} && PHP_CLI_SERVER_WORKERS_NUMERIC=${PHP_CLI_SERVER_WORKERS//\"/} && \
+    php artisan serve --host=0.0.0.0 --port=$APP_PORT_NUMERIC
+
