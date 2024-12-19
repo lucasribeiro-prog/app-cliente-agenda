@@ -13,8 +13,8 @@ RUN apt-get update && apt-get install -y \
 # Instalar Composer
 COPY --from=composer:2.6 /usr/bin/composer /usr/bin/composer
 
-# Instalar Node.js e npm
-RUN curl -fsSL https://deb.nodesource.com/setup_16.x | bash - \
+# Instalar Node.js versão 18
+RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
     && apt-get install -y nodejs
 
 # Configurar o diretório da aplicação
