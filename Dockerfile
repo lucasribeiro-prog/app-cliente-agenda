@@ -1,3 +1,7 @@
+#instalando dependencias
+composer install
+npm install
+
 # Usar uma imagem do Laravel
 FROM php:8.2-fpm
 
