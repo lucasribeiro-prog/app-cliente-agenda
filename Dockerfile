@@ -7,10 +7,15 @@ RUN apt-get update && apt-get install -y \
     unzip \
     libpq-dev \
     libzip-dev \
+    curl \
     && docker-php-ext-install pdo pdo_mysql zip
 
 # Instalar Composer
 COPY --from=composer:2.6 /usr/bin/composer /usr/bin/composer
+
+# Instalar Node.js e npm
+RUN curl -fsSL https://deb.nodesource.com/setup_16.x | bash - \
+    && apt-get install -y nodejs
 
 # Configurar o diretório da aplicação
 WORKDIR /var/www/html
