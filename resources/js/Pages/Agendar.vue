@@ -144,7 +144,7 @@ export default {
                 matricula: matricula.value,
             };
             
-            const response = await axios.post('http://localhost:8000/api/agendar', formData, {
+            const response = await axios.post(`${import.meta.env.VITE_API_URL}/agendar`, formData, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },

@@ -221,7 +221,7 @@ const submitForm = async () => {
       matricula: selectedAgendamento.value.clientes.matricula,
     };
 
-    const response = await axios.put(`http://localhost:8000/api/agendar/${selectedAgendamento.value.id}`, formData, {
+    const response = await axios.put(`${import.meta.env.VITE_API_URL}/agendar/${selectedAgendamento.value.id}`, formData, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -261,7 +261,7 @@ const submitLink = async () => {
     };
 
     await axios.post(
-      `http://localhost:8000/api/agendar`,
+      `${import.meta.env.VITE_API_URL}/agendar`,
       {
         agendamento_id: selectedAgendamento.value.id,
         link: link.value,
@@ -302,7 +302,7 @@ const buscarAgendamentos = async () => {
       console.error('Token não encontrado');
       return;
     }
-    const response = await axios.get('http://localhost:8000/api/consultar', {
+    const response = await axios.get(`${import.meta.env.VITE_API_URL}/consultar`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -348,7 +348,7 @@ const submitStatus = async () => {
       return;
     };
 
-    await axios.post('http://localhost:8000/api/agendar', {
+    await axios.post(`${import.meta.env.VITE_API_URL}/agendar`, {
         agendamento_id: selectedAgendamento.value.id,
         status: status,
         observacao: observacao.value,

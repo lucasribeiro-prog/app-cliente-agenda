@@ -213,7 +213,7 @@ const loadTable = async (type, page = 1) => {
       console.error('Token não encontrado');
       return;
     }
-    const response = await axios.get(`http://localhost:8000/api/agendar?page=${page}`, {
+    const response = await axios.get(`${import.meta.env.VITE_API_URL}/agendar?page=${page}`, {
       params: {
         page: currentPage.value,
         limit: itemsPerPage.value,
@@ -314,7 +314,7 @@ const confirmarRemocao = async () => {
       return;
     };
 
-    await axios.delete(`http://localhost:8000/api/agendar/${selectedAgendamento.value.id}`, {
+    await axios.delete(`${import.meta.env.VITE_API_URL}/agendar/${selectedAgendamento.value.id}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -335,7 +335,7 @@ const confirmarPagamento = async () => {
       return;
     };
 
-    await axios.post('http://localhost:8000/api/agendar', {
+    await axios.post(`${import.meta.env.VITE_API_URL}/agendar`, {
       agendamento_id: selectedAgendamento.value.id,
       status: 1,
     }, 
@@ -365,7 +365,7 @@ const submitForm = async () => {
       data: selectedAgendamento.value.data,
       hora: selectedAgendamento.value.hora,
     };
-    await axios.put(`http://localhost:8000/api/agendar/${selectedAgendamento.value.id}/reschedule`, formData, {
+    await axios.put(`${import.meta.env.VITE_API_URL}/agendar/${selectedAgendamento.value.id}/reschedule`, formData, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -386,7 +386,7 @@ const submitProcesso = async () => {
       return;
     };
 
-    await axios.post(`http://localhost:8000/api/agendar`, {
+    await axios.post(`${import.meta.env.VITE_API_URL}/agendar`, {
       agendamento_id: selectedAgendamento.value.id,
       process: process.value,
       status: 1,
