@@ -4,7 +4,7 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title>{{ isset($page['title']) ? $page['title'] : config('app.name', 'Laravel') }}</title>
+        <title>{{ isset($page['title'])}}</title>
         <link rel="icon" href="{{ asset('favicon.png') }}" type="image/x-icon">
 
 
