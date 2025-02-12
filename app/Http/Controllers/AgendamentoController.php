@@ -142,10 +142,12 @@ class AgendamentoController extends Controller
             $cliente->nome = $request->get('nome');
             $cliente->cpf = $request->get('cpf');
             $cliente->matricula = $request->get('matricula');
+            $cliente->save();
     
             $contato = new Contato();
             $contato->id_cliente = $cliente->id;
             $contato->telefone = $request->get('telefone');
+            $contato->save();
     
             $agendamento = new Agendamento();
             $agendamento->id_usuario = $request->get('id_usuario');
@@ -163,8 +165,6 @@ class AgendamentoController extends Controller
                 return response()->json(['error' => 'Esse horário não está disponível.'], 400);
             }
 
-            $cliente->save();
-            $contato->save();
             $agendamento->save();
     
             return response()->json(['success' => true, 'message' => 'Agendamento criado com sucesso.', 'data' => $agendamento], 201);
