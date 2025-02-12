@@ -427,7 +427,9 @@ onMounted(() => {
     console.log("Token não encontrado");
   }
 
-  loadTable('aguardando', 1);  // Carrega a tabela após o token ser verificado
+  loadTable('aguardando', 1);
+
+  document.title = 'Home - Smart Agenda';
 });
 </script>
 

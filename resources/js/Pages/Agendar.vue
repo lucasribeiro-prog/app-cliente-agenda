@@ -96,6 +96,10 @@ export default {
         const matricula = ref('');
         const message = ref('');
 
+        onMounted(() => {
+            document.title = 'Agendar - Smart Agenda';
+        });
+
         const formatTelefone = () => {
             let num = telefone.value.replace(/\D/g, '').slice(0, 11);
             if (num.length > 10) {

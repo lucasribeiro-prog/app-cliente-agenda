@@ -429,6 +429,7 @@ const formatarTelefone = (telefone) => {
 
 onMounted(() => {
   buscarAgendamentos();
+  document.title = 'Consultar - Smart Agenda';
 });
 </script>
 
