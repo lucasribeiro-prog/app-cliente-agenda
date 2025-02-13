@@ -119,3 +119,10 @@ button:hover {
   opacity: 1;
 }
 
+footer {
+  padding: 20px;
+  margin-top: 80px;
+  text-align: center;
+  font-family: 'Figtree', sans-serif;
+}
+
