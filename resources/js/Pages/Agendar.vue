@@ -41,7 +41,7 @@
                 </select>
                 <input type="date" v-model="data" required />
                 <input type="time" v-model="hora" required />
-                <input type="text" v-model="matricula" placeholder="Matrícula do Imóvel" required />
+                <input v-if="categoria === '2'" type="text" v-model="matricula" placeholder="Matrícula do Imóvel" required />
                 <input type="hidden" :value="localIdUsuario" />
                 <button type="submit">Agendar</button>
             </form>

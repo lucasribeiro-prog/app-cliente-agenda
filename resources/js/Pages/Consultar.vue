@@ -119,7 +119,7 @@
           <input type="text" v-model="selectedAgendamento.clientes.cpf" placeholder="CPF" required />
           <input type="date" v-model="selectedAgendamento.data" required />
           <input type="time" v-model="selectedAgendamento.hora" required />
-          <input type="text" v-model="selectedAgendamento.clientes.matricula" placeholder="Matrícula do Imóvel" required />
+          <input v-if="selectedAgendamento.clientes.matricula != null" type="text" v-model="selectedAgendamento.clientes.matricula" placeholder="Matrícula do Imóvel" required />
           <div class="flex justify-end">
             <button type="submit">Salvar</button>
           </div>

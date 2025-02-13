@@ -33,7 +33,6 @@ class Agendamento extends Model
             'id_usuario'  => 'exists:users,id',
             'nome' => 'required|min:3|max:40',
             'cpf' => 'required|size:11|unique:clientes,cpf',
-            'matricula' => 'required',
             'telefone' => 'required|size:11',
             'atendimento' => 'exists:atendimentos,id',
             'data' => 'required|date',
