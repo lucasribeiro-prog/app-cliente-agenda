@@ -19,5 +19,9 @@
     </head>
     <body class="font-sans antialiased">
         @inertia
+
+        <footer style="padding: 20px; margin-top: 80px; text-align: center;">
+            <p>Desenvolvido por Lucas Ribeiro | &copy; {{ date('Y') }} Todos os direitos reservados.</p>
+        </footer>
     </body>
 </html>
