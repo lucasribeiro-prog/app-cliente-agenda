@@ -5,7 +5,6 @@ import { createInertiaApp } from '@inertiajs/vue3';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { createApp, h } from 'vue';
 import { ZiggyVue } from '../../vendor/tightenco/ziggy';
-import router from './router';
 import Navbar from './Components/Navbar.vue';
 import Sidebar from './Components/Sidebar.vue';
 import Modal from './Components/Modal.vue';
@@ -28,7 +27,6 @@ createInertiaApp({
         });
 
         app.use(plugin);
-        app.use(router); // Usando o roteador
         app.use(ZiggyVue, Ziggy);
         app.mount(el);
     },
